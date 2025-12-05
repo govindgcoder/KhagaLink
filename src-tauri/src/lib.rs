@@ -4,7 +4,7 @@ pub fn run() {
         tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
-        .invoke_handler(tauri::generate_handler![create_project])
+        .invoke_handler(tauri::generate_handler![create_project, get_csv_metadata])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -36,4 +36,35 @@ fn create_project(path: String, name: String) -> Result<String, String> {
     fs::write(&path, json_data).map_err(|e| e.to_string())?;
 
     Ok("Project created successfully".to_string())
+}
+
+use std::error::Error;
+
+#[derive(Debug, Serialize)]
+pub struct CSVmetadata {
+    pub headers: Vec<String>,
+    pub total_rows: usize,
+}
+
+//reads files, get the headers, count rows
+fn read_metadata(path:&str)->Result<CSVmetadata, Box<dyn Error>>{
+    let mut rdr = csv::Reader::from_path(path)?;
+
+    let headers: Vec<String> = rdr.headers()?.iter().map(|h| h.to_string()).collect();
+
+    let total_rows = rdr.records().count();
+
+    Ok(
+        CSVmetadata{
+            headers, total_rows
+        }
+    )
+}
+
+#[tauri::command]
+fn get_csv_metadata(path:String)->Result<CSVmetadata, String>{
+    match read_metadata(&path){
+        Ok(data)=>Ok(data),
+        Err(e)=>Err(e.to_string()),
+    }
 }

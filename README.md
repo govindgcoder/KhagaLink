@@ -1,1 +1,1 @@
-# Khagalink
+# KhagaLink
