@@ -10,7 +10,7 @@
 
 **KhagaLink** is a desktop application designed to streamline the analysis of model rocketry flight data. Built with performance and cross-platform compatibility in mind using **Tauri** and **React**, it is envisioned as a central hub for mission replay, sensor data analysis, and real-time telemetry monitoring.
 
-A project for my model rocketry club: [*VeloCET*](velo.cet.ac.in)
+A project for my model rocketry club: [*VeloCET*](http://velo.cet.ac.in)
 
 Currently in active development, KhagaLink aims to bridge the gap between raw CSV logs and actionable flight insights, eventually evolving into a full-featured Ground Control Station (GCS) with AI-assisted data interpretation.
 
