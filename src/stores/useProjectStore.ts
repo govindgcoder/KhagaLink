@@ -13,6 +13,9 @@ interface ProjectState {
     currentCSVmetadata: CSVmetadata | null;
     createProject: (path: string, name: string) => Promise<void>;
     loadCSVmetadata: (path: string) => Promise<void>;
+    
+    currentCSVrows: string[][] | null; 
+    loadCSVrows: (path: string, start_size: number, window_size: number) => Promise<void>;
 }
 
 interface CSVmetadata {
@@ -44,19 +47,33 @@ export const useProjectStore = create<ProjectState>((set) => ({
             set({ error: err });
         }
     },
-    
+
     currentCSVmetadata: null,
-    
+
     loadCSVmetadata: async (path: string) => {
         try {
             const new_csv_metadata = await invoke<CSVmetadata>("get_csv_metadata", {path})
-            
+
             set({currentCSVmetadata: new_csv_metadata, error: null})
             console.log("Recieved: ",new_csv_metadata)
         } catch (err) {
             console.log("Error in loading csv metadata: ",err)
             set({error: err})
         }
-    }
+    },
     
+	currentCSVrows: null,
+
+    loadCSVrows: async (path: string, start_index: number, window_size: number) => {
+  		try {
+  		const current_rows = await invoke<string[][]>("get_csv_rows", {path: path, startIndex: start_index, windowSize: window_size})
+    set({currentCSVrows: current_rows, error: null})
+    console.log("csv rows recieved!",start_index,":",window_size)
+    	}
+     	catch (err) {
+      		console.error("Error in loading csv rows: ",err)
+      		set({error: err})
+      	}
+	}
+
 }));

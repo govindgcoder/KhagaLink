@@ -4,7 +4,7 @@ pub fn run() {
         tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
-        .invoke_handler(tauri::generate_handler![create_project, get_csv_metadata])
+        .invoke_handler(tauri::generate_handler![create_project, get_csv_metadata, get_csv_rows])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -67,4 +67,28 @@ fn get_csv_metadata(path:String)->Result<CSVmetadata, String>{
         Ok(data)=>Ok(data),
         Err(e)=>Err(e.to_string()),
     }
+}
+
+// to get a window of csv rows
+fn read_csv_rows(path:&str, start_index:usize, window_size:usize)->Result<Vec<Vec<String>>, String>{	
+	let mut rdr = csv::Reader::from_path(path).map_err(|e| e.to_string())?;
+	let mut rows: Vec<Vec<String>> = Vec::new();
+
+	let chunk = rdr.records().skip(start_index).take(window_size);
+
+	for result in chunk {
+		let record = result.map_err(|e| e.to_string())?;
+		let row_vec: Vec<String> = record.iter().map(|field| field.to_string()).collect();
+
+		rows.push(row_vec);
+	}
+	Ok(rows)
+}
+//the bridge
+#[tauri::command]
+fn get_csv_rows(path:String, start_index:usize, window_size:usize)->Result<Vec<Vec<String>>,String>{
+	match read_csv_rows(&path, start_index, window_size){
+		Ok(rows)=>Ok(rows),
+		Err(e) => Err(e),
+	}
 }
