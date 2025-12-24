@@ -35,7 +35,7 @@ I am currently finalizing **v0.1**. The roadmap prioritizes core data functional
 
 ### Phase 1: The Core (Data Analysis)
 
-- [ ] **v0.1 (The Archive):** Mission creation system, flight log (CSV) upload & parsing, JSON-based local storage.
+- [x] **v0.1 (The Archive):** Mission creation system, flight log (CSV) upload & parsing, JSON-based local storage.
 - [ ] **v0.2 (The Visuals):** Interactive line graphs for post-flight analysis. Plotting altitude, velocity, and sensor data from uploaded CSVs.
 
 ### Phase 2: The Live Link (Real-Time)
