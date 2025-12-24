@@ -4,7 +4,7 @@ pub fn run() {
         tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
-        .invoke_handler(tauri::generate_handler![create_project, get_csv_metadata, get_csv_rows])
+        .invoke_handler(tauri::generate_handler![create_project, get_csv_metadata, get_csv_rows, load_project])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -23,17 +23,23 @@ pub struct CsvFileConfig {
     pub is_visible: bool,
 }
 
+use std::path::Path;
+
 use std::fs;
 #[tauri::command]
 fn create_project(path: String, name: String) -> Result<String, String> {
     let new_project = Project {
-        name: name,
+        name: name.clone(),
         created_at: "2025-11-3".to_string(),
         csv_files: vec![],
     };
     let json_data = serde_json::to_string_pretty(&new_project).map_err(|e| e.to_string())?;
+    
+    let folder_path = Path::new(&path);
+    
+    let file_path = folder_path.join("project.json");
 
-    fs::write(&path, json_data).map_err(|e| e.to_string())?;
+    fs::write(&file_path, json_data).map_err(|e| e.to_string())?;
 
     Ok("Project created successfully".to_string())
 }
@@ -91,4 +97,11 @@ fn get_csv_rows(path:String, start_index:usize, window_size:usize)->Result<Vec<V
 		Ok(rows)=>Ok(rows),
 		Err(e) => Err(e),
 	}
+}
+
+#[tauri::command]
+fn load_project(path: String)-> Result<Project, String>{
+	let json_data = fs::read_to_string(path).map_err(|e| e.to_string())?;
+	let project_data: Project = serde_json::from_str(&json_data).map_err(|e| e.to_string())?;
+    Ok(project_data)
 }

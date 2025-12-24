@@ -1,52 +1,51 @@
 # 🚀💻 KhagaLink
 
-![Version](https://img.shields.io/badge/version-0.0.2-violet) ![Stack](https://img.shields.io/badge/tech-React_|_Tauri_|_Rust-red) ![License](https://img.shields.io/badge/license-MIT-green)
+![Version](https://img.shields.io/badge/version-0.1.0-violet) ![Stack](https://img.shields.io/badge/tech-React_|_Tauri_|_Rust-red) ![License](https://img.shields.io/badge/license-MIT-green)
 
-> **Flight Data Visualization & Telemetry Dashboard for Model Rocketry.**
+> **Mission Control & Telemetry Dashboard for Model Rocketry.**
 
-(In-Development!)
+**(In Active Development)**
 
 ## 📖 About
 
-**KhagaLink** is a desktop application designed to streamline the analysis of model rocketry flight data. Built with performance and cross-platform compatibility in mind using **Tauri** and **React**, it is envisioned as a central hub for mission replay, sensor data analysis, and real-time telemetry monitoring.
+**KhagaLink** is a high-performance desktop Ground Control Station (GCS) designed for model rocketry missions. Built with **Tauri (Rust)** and **React**, it serves as the central hub for mission configuration, post-flight analysis, and real-time telemetry monitoring.
 
 A project for my model rocketry club: [_VeloCET_](http://velo.cet.ac.in)
 
-Currently in active development, KhagaLink aims to bridge the gap between raw CSV logs and actionable flight insights, eventually evolving into a full-featured Ground Control Station (GCS) with AI-assisted data interpretation.
+KhagaLink bridges the gap between raw flight logs and actionable insights. Unlike web-based tools, it leverages a native Rust backend for low-latency serial communication and data processing, ensuring reliability during field operations.
 
-## ✨ Key Features (planned for v0.1)
+## ✨ Key Features (Targeting v0.1 - v0.2)
 
-- **📂 Project Management System:** Organize flight data by distinct projects/launches.
-- **📊 CSV Ingestion Engine:** Rapid parsing of high-frequency sensor logs (accelerometer, gyroscope, barometer).
-- **📈 Interactive Visualization:** Graphs for post-flight analysis of altitude, velocity, and acceleration.
-- **🎨 Modern UI/UX:** A clean, dark-mode friendly interface designed for clarity during field operations.
+- **📂 Mission Management:** Organize flight data by specific launches/projects with metadata.
+- **📊 CSV Ingestion Engine:** Rapid parsing of high-frequency sensor logs (accelerometer, gyroscope, barometer) using Rust's `csv` crate.
+- **📈 High-Performance Visualization:** Responsive line graphs for analyzing altitude, velocity, and acceleration data.
+- **🎨 Field-Ready UI:** A clean, high-contrast interface designed for visibility on laptops during outdoor launches.
 
 ## 🛠 Tech Stack
 
 - **Frontend:** React (TypeScript), CSS
 - **Backend / Native:** Tauri (Rust)
-- **Data Visualization:** Recharts / Chart.js (?)
+- **Data Visualization:** Recharts
 - **State Management:** Zustand
+- **Hardware Interface:** Rust `serialport` (Planned)
 
 ## 🗺 Development Roadmap
 
-I am currently targeting **v0.1**. Below is the strategic plan for future releases:
+I am currently finalizing **v0.1**. The roadmap prioritizes core data functionality before real-time operations.
 
-### Phase 1: Core Foundation
+### Phase 1: The Core (Data Analysis)
 
-- [ ] **v0.1:** Project list system, CSV upload, Basic Graph Visualizer, UI/UX Polish.
-- [ ] **v0.5:** Real-time Telemetry via WebSockets (ESP32/STM32 Integration).
+- [ ] **v0.1 (The Archive):** Mission creation system, flight log (CSV) upload & parsing, JSON-based local storage.
+- [ ] **v0.2 (The Visuals):** Interactive line graphs for post-flight analysis. Plotting altitude, velocity, and sensor data from uploaded CSVs.
 
-### Phase 2: Advanced Flight Operations
+### Phase 2: The Live Link (Real-Time)
 
-- [ ] **v0.6:** Full Telemetry Management (Signal strength monitoring, packet loss handling).
-- [ ] **v0.7:** 3D Trajectory Visualizer.
+- [ ] **v0.5 (Telemetry):** Native integration with **Rust Serialport**. Reading real-time data streams from flight computers (ESP32/STM32).
+- [ ] **v0.6 (Live Monitor):** Real-time graphing dashboard with packet loss handling and signal strength monitoring.
 
-### Phase 3: AI & Intelligence
+### Phase 3: The Command (GCS)
 
-- [ ] **v0.8:** Integrated LLM Chatbot for documentation and basic queries.
-- [ ] **v0.9:** RAG (Retrieval-Augmented Generation) functionality to allow the AI to "chat" with your flight data logs for anomaly detection.
-- [ ] **v1.0:** Complete Suite Release (Stable GCS + Post-flight Analysis).
+- [ ] **v1.0 (Mission Control):** GPS integration using Leaflet maps to track rocket recovery location. Complete "Ground Control Station" suite.
 
 ## 🚀 Getting Started
 
@@ -55,7 +54,7 @@ I am currently targeting **v0.1**. Below is the strategic plan for future releas
 Ensure you have the following installed:
 
 - [Node.js](https://nodejs.org/) (LTS)
-- [Rust & Cargo](https://www.rust-lang.org/tools/install) (Required for Tauri)
+- [Rust & Cargo](https://www.rust-lang.org/tools/install) (Required for the Tauri backend)
 
 ### Installation
 
@@ -66,7 +65,7 @@ Ensure you have the following installed:
     cd khagalink
     ```
 
-2.  **Install dependencies (under work)**
+2.  **Install frontend dependencies**
 
     ```bash
     npm install
@@ -79,12 +78,14 @@ Ensure you have the following installed:
 
 ## 🏗 Architecture
 
-- **Frontend:** Handles all user interactions and rendering of charts.
-- **Tauri Core (Rust):** Manages file system access (reading CSVs), handles WebSocket connections for telemetry, and ensures high-performance system integration.
+- **Frontend (React):** Handles the Mission Control UI and renders charts using `Recharts`.
+- **Tauri Core (Rust):**
+    - Manages file system access for secure CSV reading/writing.
+    - **(Upcoming):** Handles the `serialport` thread to ingest USB telemetry data without blocking the UI.
 
 ## 🤝 Development
 
-This project is developed primarily for the VeloCET payload team. Suggestions are welcome!
+This project is developed primarily for the **VeloCET Payload Team**. Suggestions and PRs are welcome!
 
 ## 📄 License
 

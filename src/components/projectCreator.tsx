@@ -1,60 +1,70 @@
-import { useState } from 'react';
-import { useProjectStore } from '../stores/useProjectStore';
-import { open } from '@tauri-apps/plugin-dialog';
+import { useState } from "react";
+import { useProjectStore } from "../stores/useProjectStore";
+import { open } from "@tauri-apps/plugin-dialog";
 
-export default function ProjectCreator(){
-    const [name, setName] = useState("");
-    const [path, setPath] = useState("");
-    
-    const createProject = useProjectStore((state)=> state.createProject)
-    
-    const handleCreate = ()=>{
-        createProject(path, name)
-    }
-    
-    const handleBrowse = async () => {
-        try {
-            const selected = await open({
-                directory: true,
-                multiple: false,
-                title: "Select one folder"
-            });
-            if (selected) {
-                setPath(selected)
-            }
-        } catch(err) {
-            console.log("Failed to open dialog: ", err)
-        }
-    }
-    
-    return (
-            <div className="overlay-container">
-                <fieldset>
-                    <label style={{ margin: "8px" }}>Name:</label>
-                    <input 
-                        type='text' 
-                        value={name}
-                        onChange={(e) => setName(e.target.value)} 
-                    />
-                    
-                    <label style={{ margin: "8px" }}>Path:</label>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                        <input 
-                            type='text' 
-                            value={path}
-                            readOnly
-                            placeholder="Select a folder..."
-                        />
-                        <button onClick={handleBrowse}>Browse</button>
-                    </div>
-    
-                    <button 
-                        onClick={handleCreate}
-                        style={{ marginTop: '16px' }}
-                    >
-                        Create Project
-                    </button>
-                </fieldset>
-            </div>
-        );
+export default function ProjectCreator() {
+	const [name, setName] = useState("");
+	const [path, setPath] = useState("");
+
+	const createProject = useProjectStore((state) => state.createProject);
+
+	const loadView = useProjectStore((state) => state.load_view);
+
+	const handleCreate = () => {
+		createProject(path, name);
+		loadView("Project");
+	};
+
+	const handleBrowse = async () => {
+		try {
+			const selected = await open({
+				directory: true,
+				multiple: false,
+				title: "Select one folder",
+			});
+			if (selected) {
+				setPath(selected);
+			}
+		} catch (err) {
+			console.log("Failed to open dialog: ", err);
+		}
+	};
+
+	return (
+		<div className="p-6 border rounded-lg max-w-lg mx-auto">
+			<fieldset className="space-y-6">
+				<label className="block mb-2">Name:</label>
+				<input
+					type="text"
+					value={name}
+					onChange={(e) => setName(e.target.value)}
+					className="border border-gray-300 rounded px-2 py-1 w-full"
+				/>
+
+				<label className="block mb-2">Path:</label>
+				<div className="flex gap-4 items-center">
+					<input
+						type="text"
+						value={path}
+						readOnly
+						placeholder="Select a folder..."
+						className="border border-gray-300 rounded px-2 py-1 flex-grow"
+					/>
+					<button
+						onClick={handleBrowse}
+						className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+					>
+						Browse
+					</button>
+				</div>
+
+				<button
+					onClick={handleCreate}
+					className="mt-6 bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600"
+				>
+					Create Project
+				</button>
+			</fieldset>
+		</div>
+	);
 }
