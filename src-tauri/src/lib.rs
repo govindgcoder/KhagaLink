@@ -4,7 +4,7 @@ pub fn run() {
         tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
-        .invoke_handler(tauri::generate_handler![create_project, get_csv_metadata, get_csv_rows, load_project])
+        .invoke_handler(tauri::generate_handler![create_project, get_csv_metadata, get_csv_rows, load_project, save_project])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -14,12 +14,13 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Project {
     pub name: String,
+    pub path: String,
     pub created_at: String,
     pub csv_files: Vec<CsvFileConfig>,
 }
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CsvFileConfig {
-    pub url: String,
+    pub path: String,
     pub is_visible: bool,
 }
 
@@ -30,13 +31,14 @@ use std::fs;
 fn create_project(path: String, name: String) -> Result<String, String> {
     let new_project = Project {
         name: name.clone(),
+        path: path.clone(),
         created_at: "2025-11-3".to_string(),
         csv_files: vec![],
     };
     let json_data = serde_json::to_string_pretty(&new_project).map_err(|e| e.to_string())?;
-    
+
     let folder_path = Path::new(&path);
-    
+
     let file_path = folder_path.join("project.json");
 
     fs::write(&file_path, json_data).map_err(|e| e.to_string())?;
@@ -76,7 +78,7 @@ fn get_csv_metadata(path:String)->Result<CSVmetadata, String>{
 }
 
 // to get a window of csv rows
-fn read_csv_rows(path:&str, start_index:usize, window_size:usize)->Result<Vec<Vec<String>>, String>{	
+fn read_csv_rows(path:&str, start_index:usize, window_size:usize)->Result<Vec<Vec<String>>, String>{
 	let mut rdr = csv::Reader::from_path(path).map_err(|e| e.to_string())?;
 	let mut rows: Vec<Vec<String>> = Vec::new();
 
@@ -104,4 +106,12 @@ fn load_project(path: String)-> Result<Project, String>{
 	let json_data = fs::read_to_string(path).map_err(|e| e.to_string())?;
 	let project_data: Project = serde_json::from_str(&json_data).map_err(|e| e.to_string())?;
     Ok(project_data)
+}
+
+#[tauri::command]
+fn save_project(project: Project)-> Result<(), String>{
+	let json_data = serde_json::to_string(&project).map_err(|e| e.to_string())?;
+	let file_path = Path::new(&project.path).join("project.json");
+    fs::write(file_path, json_data).map_err(|e| e.to_string())?;
+	Ok(())
 }

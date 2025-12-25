@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useProjectStore } from "../stores/useProjectStore";
 import { open } from "@tauri-apps/plugin-dialog";
 
@@ -18,6 +18,8 @@ export default function CsvVisualizer() {
 	const loadCSVrows = useProjectStore((state) => state.loadCSVrows);
 
 	const loadView = useProjectStore((state) => state.load_view);
+	
+	const addCsvToList = useProjectStore((state) => state.addCsvToList);
 
 	// if (!metadata) {
 	// 	return <div>No CSV loaded</div>;
@@ -25,6 +27,7 @@ export default function CsvVisualizer() {
 
 	const handleView = () => {
 		if (!path) return;
+		addCsvToList(path);
 		loadCSVmetadata(path);
 		loadCSVrows(path, 0, 50);
 	};
@@ -63,6 +66,13 @@ export default function CsvVisualizer() {
 			console.log("Failed to open dialog: ", err);
 		}
 	};
+	// update table when another file is selected
+	useEffect(()=>{
+		if(path){
+			handleView()
+			setOffset(0)
+		}
+	},[path])
 
 	return (
 		<div
@@ -119,23 +129,21 @@ export default function CsvVisualizer() {
 						fontFamily: "'Arial', sans-serif",
 					}}
 				>
-					Browse
-				</button>
-				<button
-					onClick={handleView}
-					style={{
-						backgroundColor: "#007BFF",
-						color: "white",
-						padding: "10px 20px",
-						border: "none",
-						borderRadius: "4px",
-						cursor: "pointer",
-						fontFamily: "'Arial', sans-serif",
-					}}
-				>
-					View
+					View New CSV
 				</button>
 			</div>
+			
+			<div>
+				{currentProject?.csv_files.map((file, index)=> {
+					
+					return (
+						<div key={index} className={`m-4 ${file.path === path ? 'bg-blue-500 text-white' : ''}`} onClick={()=>setPath(file.path)}>
+							{file.path.replace(/^.*[\\\/]/, '')}
+						</div>
+					)
+				})}
+			</div>
+			
 			<p
 				className="mt-2"
 				style={{
@@ -144,19 +152,9 @@ export default function CsvVisualizer() {
 					color: "#555",
 				}}
 			>
-				Total Rows: {metadata == null ? 0 : metadata.total_rows}
+				Total Rows: {metadata == null ? 0 : metadata.total_rows} | Columns: {metadata ? metadata.headers.length : 0}
 			</p>
-
-			<h3
-				className="font-bold mt-4"
-				style={{
-					fontFamily: "'Arial', sans-serif",
-					fontSize: "18px",
-					color: "#333",
-				}}
-			>
-				Columns:
-			</h3>
+			
 			{/*<ul className="list-disc pl-5">
 				{metadata
 					? metadata.headers.map((header, index) => (

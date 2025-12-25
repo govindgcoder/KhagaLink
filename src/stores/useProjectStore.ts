@@ -5,11 +5,16 @@ import { createJSONStorage } from "zustand/middleware";
 
 type view = "Home" | "Project";
 
+interface CsvFileConfig {
+	path: string;
+	is_visible: boolean;
+}
+
 interface Project {
 	name: string;
 	path: string;
 	created_at: string;
-	csv_files: any[];
+	csv_files: CsvFileConfig[];
 }
 
 interface ProjectList {
@@ -33,6 +38,7 @@ interface ProjectState {
 		window_size: number,
 	) => Promise<void>;
 	loadProject: (path: string) => Promise<void>;
+	addCsvToList: (path: string) => Promise<void>;
 }
 
 interface CSVmetadata {
@@ -73,14 +79,15 @@ export const useProjectStore = create<ProjectState>((set) => ({
 	createProject: async (path: string, name: string) => {
 		try {
 			const existingProject = useGlobalStore
-				.getState().projects.find((project)=>project.path === path);
-			
-			if(existingProject){
+				.getState()
+				.projects.find((project) => project.path === path);
+
+			if (existingProject) {
 				set({ current_project: existingProject, error: null });
-				alert("A project already exists here!")
+				alert("A project already exists here!");
 				return;
 			}
-			
+
 			const response = await invoke("create_project", {
 				path: path,
 				name: name,
@@ -144,6 +151,7 @@ export const useProjectStore = create<ProjectState>((set) => ({
 
 	loadProject: async (path: string) => {
 		try {
+			set({currentCSVmetadata: null, currentCSVrows: null});
 			const project = await invoke<Project>("load_project", {
 				path: `${path}/project.json`,
 			});
@@ -151,5 +159,28 @@ export const useProjectStore = create<ProjectState>((set) => ({
 		} catch (err) {
 			console.error("File not found: ", err);
 		}
+	},
+
+	addCsvToList: async (path: string) => {
+		const current_project = useProjectStore.getState().current_project;
+		if (!current_project) return;
+		for (const csvPath of current_project.csv_files) {
+			if (csvPath.path === path) return;
+		}
+		[];
+		const updated_csv_files = [
+			...current_project.csv_files,
+			{ path: path, is_visible: true },
+		];
+		const updated_project = {
+			...current_project,
+			csv_files: updated_csv_files,
+		}
+		set({
+			current_project: updated_project,
+		});
+		await invoke("save_project", {
+			project: updated_project,
+		});
 	},
 }));
