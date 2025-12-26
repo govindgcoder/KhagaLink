@@ -11,6 +11,10 @@ export default function ProjectCreator() {
 	const loadView = useProjectStore((state) => state.load_view);
 
 	const handleCreate = () => {
+		if (!path) {
+			alert("Please select a folder");
+			return;
+		}
 		createProject(path, name);
 		loadView("Project");
 	};

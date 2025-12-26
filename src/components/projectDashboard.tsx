@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import CsvVisualizer from "./csvVisualizer";
 
 export default function ProjectDashboard() {
@@ -22,7 +22,12 @@ export default function ProjectDashboard() {
 		<div style={{ height: "100vh" }}>
 			<div
 				className="project-dashboard-layout"
-				style={{ display: "flex", height: "100vh", gap: "1rem", padding: "1rem" }}
+				style={{
+					display: "flex",
+					height: "100vh",
+					gap: "1rem",
+					padding: "1rem",
+				}}
 			>
 				<div id="sidebar" style={{ height: "100vh" }}>
 					{isSidebarOpen ? (
@@ -47,8 +52,8 @@ export default function ProjectDashboard() {
 						</div>
 					)}
 				</div>
-				<div id="main-csv-content" style={{ flex: 1}}>
-					<CsvVisualizer/>
+				<div id="main-csv-content" style={{ flex: 1 }}>
+					<CsvVisualizer />
 				</div>
 			</div>
 		</div>

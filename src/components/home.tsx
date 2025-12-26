@@ -3,7 +3,6 @@ import { useState } from "react";
 import ProjectCreator from "./projectCreator";
 import { useGlobalStore, useProjectStore } from "../stores/useProjectStore";
 import { open } from "@tauri-apps/plugin-dialog";
-import { path } from "@tauri-apps/api";
 
 export default function Home() {
 	const [isNewProject, setIsNewProject] = useState(false);
@@ -16,6 +15,10 @@ export default function Home() {
 	const projectList = useGlobalStore((state) => state.projects);
 
 	const handleLoadProject = (pathURL: string) => {
+		if (!pathURL) {
+			alert("Please select a project file");
+			return;
+		}
 		loadProject(pathURL);
 		loadView("Project");
 	};
@@ -94,7 +97,7 @@ export default function Home() {
 						<div>
 							{
 								<button
-									className="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300"
+									className="bg-gray-200 m-4 px-4 py-2 rounded hover:bg-gray-300"
 									onClick={() =>
 										handleLoadProject(project.path)
 									}

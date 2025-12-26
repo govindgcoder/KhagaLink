@@ -110,10 +110,11 @@ export default function CsvVisualizer() {
 			>
 				CSV Analysis
 			</h2>
-			<div className="flex gap-2">
+			<div className="flex gap-2 m-4">
 				<input
 					type="text"
 					value={path}
+					hidden
 					readOnly
 					placeholder="Select a folder..."
 				/>
@@ -129,7 +130,7 @@ export default function CsvVisualizer() {
 						fontFamily: "'Arial', sans-serif",
 					}}
 				>
-					View New CSV
+					Add New CSV
 				</button>
 			</div>
 			
@@ -137,7 +138,7 @@ export default function CsvVisualizer() {
 				{currentProject?.csv_files.map((file, index)=> {
 					
 					return (
-						<div key={index} className={`m-4 ${file.path === path ? 'bg-blue-500 text-white' : ''}`} onClick={()=>setPath(file.path)}>
+						<div key={index} className={`m-4 p-4 ${file.path === path ? 'bg-blue-500 text-white' : 'bg-blue-300'}`} onClick={()=>setPath(file.path)}>
 							{file.path.replace(/^.*[\\\/]/, '')}
 						</div>
 					)
