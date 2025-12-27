@@ -1,23 +1,32 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'Urbanist';
+  src: url('./src/assets/Urbanist.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Urbanist Italic';
+  src: url('./src/assets/Urbanist-Italic.ttf') format('truetype');
+}
+
+.italic-text {
+  font-family: 'Urbanist Italic', cursive;
+}
+
+:root {
+    --background-color: #2d3142;
+    --surface-color: #bfc0c0;
+    --primary-color: #ef8354;
+    --secondary-color: #4f5d75;
+}
+
 html,
 body,
 #root {
     height: 100%;
     margin: 0;
-    font-family:
-        system-ui,
-        -apple-system,
-        "Segoe UI",
-        Roboto,
-        "Helvetica Neue",
-        Arial;
-}
-
-/*
-menu stuff
-*/
-.overlay-container {
-    background-color: gray;
-    
+    font-family: 'Urbanist', sans-serif;
+    color: #ffffff;
+    background-color: var(--background-color);
 }
