@@ -20,6 +20,7 @@ interface Project {
 interface ProjectList {
 	projects: Project[];
 	addProject: (project: Project) => void;
+	deleteProject: (path: string) => void;
 }
 
 interface ProjectState {
@@ -39,6 +40,7 @@ interface ProjectState {
 	) => Promise<void>;
 	loadProject: (path: string) => Promise<void>;
 	addCsvToList: (path: string) => Promise<void>;
+	delCsvFromList: (path: string) => Promise<void>;
 }
 
 interface CSVmetadata {
@@ -61,6 +63,10 @@ export const useGlobalStore = create<ProjectList>()(
 				}
 				set({ projects: [...get().projects, project] });
 			},
+			/* create a new project array without the given project based on it's path */
+			deleteProject: (path: string) => {
+				set({projects: get().projects.filter((project) => project.path !== path)})
+			}
 		}),
 		{
 			name: "project-list-storage",
@@ -138,13 +144,21 @@ export const useProjectStore = create<ProjectState>()(
 				window_size: number,
 			) => {
 				try {
-					const current_rows = await invoke<string[][]>("get_csv_rows", {
-						path: path,
-						startIndex: start_index,
-						windowSize: window_size,
-					});
+					const current_rows = await invoke<string[][]>(
+						"get_csv_rows",
+						{
+							path: path,
+							startIndex: start_index,
+							windowSize: window_size,
+						},
+					);
 					set({ currentCSVrows: current_rows, error: null });
-					console.log("csv rows recieved!", start_index, ":", window_size);
+					console.log(
+						"csv rows recieved!",
+						start_index,
+						":",
+						window_size,
+					);
 				} catch (err) {
 					console.error("Error in loading csv rows: ", err);
 					set({ error: err });
@@ -173,6 +187,24 @@ export const useProjectStore = create<ProjectState>()(
 					...current_project.csv_files,
 					{ path: path, is_visible: true },
 				];
+				const updated_project = {
+					...current_project,
+					csv_files: updated_csv_files,
+				};
+				set({
+					current_project: updated_project,
+				});
+				await invoke("save_project", {
+					project: updated_project,
+				});
+			},
+			
+			delCsvFromList: async (path: string) => {
+				const current_project = get().current_project;
+				if (!current_project) return;
+				const updated_csv_files = current_project.csv_files.filter(
+					(csvPath) => csvPath.path !== path
+				);
 				const updated_project = {
 					...current_project,
 					csv_files: updated_csv_files,

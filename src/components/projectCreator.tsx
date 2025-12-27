@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useProjectStore } from "../stores/useProjectStore";
+import { useProjectStore } from "../stores/useStore";
 import { open } from "@tauri-apps/plugin-dialog";
 
 export default function ProjectCreator() {
@@ -11,6 +11,10 @@ export default function ProjectCreator() {
 	const loadView = useProjectStore((state) => state.load_view);
 
 	const handleCreate = () => {
+		if (!name) {
+			alert("Please enter a name");
+			return;
+		}
 		if (!path) {
 			alert("Please select a folder");
 			return;

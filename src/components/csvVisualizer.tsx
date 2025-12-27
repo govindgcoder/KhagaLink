@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useProjectStore } from "../stores/useProjectStore";
+import { useProjectStore } from "../stores/useStore";
 import { open } from "@tauri-apps/plugin-dialog";
 
 export default function CsvVisualizer() {
@@ -18,8 +18,10 @@ export default function CsvVisualizer() {
 	const loadCSVrows = useProjectStore((state) => state.loadCSVrows);
 
 	const loadView = useProjectStore((state) => state.load_view);
-	
+
 	const addCsvToList = useProjectStore((state) => state.addCsvToList);
+	
+	const delCsvFromList = useProjectStore((state) => state.delCsvFromList);
 
 	// if (!metadata) {
 	// 	return <div>No CSV loaded</div>;
@@ -67,12 +69,12 @@ export default function CsvVisualizer() {
 		}
 	};
 	// update table when another file is selected
-	useEffect(()=>{
-		if(path){
-			handleView()
-			setOffset(0)
+	useEffect(() => {
+		if (path) {
+			handleView();
+			setOffset(0);
 		}
-	},[path])
+	}, [path]);
 
 	return (
 		<div
@@ -133,18 +135,29 @@ export default function CsvVisualizer() {
 					Add New CSV
 				</button>
 			</div>
-			
+
 			<div>
-				{currentProject?.csv_files.map((file, index)=> {
-					
+				{currentProject?.csv_files.map((file, index) => {
 					return (
-						<div key={index} className={`m-4 p-4 ${file.path === path ? 'bg-blue-500 text-white' : 'bg-blue-300'}`} onClick={()=>setPath(file.path)}>
-							{file.path.replace(/^.*[\\\/]/, '')}
+						<div
+							key={index}
+							className={`m-4 p-4 flex ${file.path === path ? "bg-blue-500 text-white" : "bg-blue-300"}`}
+							
+						><button className="w-full" onClick={() => setPath(file.path)}>
+							{file.path.replace(/^.*[\\\/]/, "")}
+						</button>
+							<button
+								onClick={() => delCsvFromList(file.path)}
+								className="bg-red-500 px-3 py-1 rounded font-mono"
+							>
+								Delete
+							</button>
 						</div>
-					)
+						
+					);
 				})}
 			</div>
-			
+
 			<p
 				className="mt-2"
 				style={{
@@ -153,9 +166,10 @@ export default function CsvVisualizer() {
 					color: "#555",
 				}}
 			>
-				Total Rows: {metadata == null ? 0 : metadata.total_rows} | Columns: {metadata ? metadata.headers.length : 0}
+				Total Rows: {metadata == null ? 0 : metadata.total_rows} |
+				Columns: {metadata ? metadata.headers.length : 0}
 			</p>
-			
+
 			{/*<ul className="list-disc pl-5">
 				{metadata
 					? metadata.headers.map((header, index) => (

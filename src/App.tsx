@@ -1,4 +1,4 @@
-import { useProjectStore } from "./stores/useProjectStore";
+import { useProjectStore } from "./stores/useStore";
 import Home from "./components/home";
 import ProjectDashboard from "./components/projectDashboard";
 
@@ -14,7 +14,7 @@ function App() {
 	} else {
 		return (
 			<div>
-				<ProjectDashboard/>
+				<ProjectDashboard />
 			</div>
 		);
 	}

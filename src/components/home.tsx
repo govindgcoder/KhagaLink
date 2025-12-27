@@ -1,7 +1,7 @@
 import "react";
 import { useState } from "react";
 import ProjectCreator from "./projectCreator";
-import { useGlobalStore, useProjectStore } from "../stores/useProjectStore";
+import { useGlobalStore, useProjectStore } from "../stores/useStore";
 import { open } from "@tauri-apps/plugin-dialog";
 
 export default function Home() {
@@ -13,6 +13,8 @@ export default function Home() {
 	const loadView = useProjectStore((state) => state.load_view);
 
 	const projectList = useGlobalStore((state) => state.projects);
+	
+	const deleteProject = useGlobalStore((state) => state.deleteProject);
 
 	const handleLoadProject = (pathURL: string) => {
 		if (!pathURL) {
@@ -41,8 +43,18 @@ export default function Home() {
 			console.log("Failed to open dialog: ", err);
 		}
 	};
+	
+	const handleDeleteProject = (path: string) => {
+		deleteProject(path);
+		alert("project deleted")
+		setPath("");
+	};
 
 	return (
+		// check whether the global store has hydrated
+		!useGlobalStore.persist.hasHydrated() ? 
+		<div className="size-screen justify-center items-center">Loading...</div>
+		:
 		<div className="p-4 border mt-4" style={{ minWidth: "800px" }}>
 			<center>
 				<h2 className="text-xl font-bold mb-4">Home</h2>
@@ -60,9 +72,11 @@ export default function Home() {
 					{isNewProject ? <ProjectCreator></ProjectCreator> : null}
 				</div>
 			</div>
+			{!isNewProject ? 
 
-			<div>
-				{!isNewProject ? (
+			(
+				<div>
+				<div>
 					<fieldset className="space-y-4">
 						<label className="block mb-2">Path:</label>
 						<div className="flex gap-2">
@@ -88,29 +102,29 @@ export default function Home() {
 							Load Project
 						</button>
 					</fieldset>
-				) : null}
-			</div>
+			</div> 
 
-			<div className="border border-black mt-12 p-4">
+			<div className="border border-black mt-12 p-4 flex flex-col gap-4">
 				{projectList.length > 0 ? (
 					projectList.map((project) => (
-						<div>
-							{
+						<div className="flex  items-center">
 								<button
-									className="bg-gray-200 m-4 px-4 py-2 rounded hover:bg-gray-300"
+									className="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300 grow-10"
 									onClick={() =>
 										handleLoadProject(project.path)
 									}
 								>
 									{project.name}
 								</button>
-							}
+								<button className="w-8 h-10 rounded grow-1 bg-red-300" onClick={() => handleDeleteProject(project.path)}>X</button>
 						</div>
 					))
 				) : (
 					<p>Start a new Project!</p>
 				)}
-			</div>
+			</div></div>)
+			
+			: null}
 		</div>
 	);
 }
