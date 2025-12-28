@@ -30,3 +30,13 @@ body,
     color: #ffffff;
     background-color: var(--background-color);
 }
+
+@keyframes fadeingOutIn {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.fadeState {
+  animation: fadeingOutIn 0.6s ease-in-out;
+}
