@@ -40,3 +40,7 @@ body,
 .fadeState {
   animation: fadeingOutIn 0.6s ease-in-out;
 }
+
+fieldset {
+	font-weight: bolder;
+}
