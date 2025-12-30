@@ -1,9 +1,8 @@
 import "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ProjectLoader from "./projectLoader";
 import ProjectCreator from "./projectCreator";
 import { useGlobalStore, useProjectStore } from "../stores/useStore";
-import { open } from "@tauri-apps/plugin-dialog";
 
 export default function Home() {
 	const [isNewProject, setIsNewProject] = useState(false);
@@ -16,6 +15,10 @@ export default function Home() {
 	const deleteProject = useGlobalStore((state) => state.deleteProject);
 
 	const loadProject = useProjectStore((state) => state.loadProject);
+
+	useEffect(() => {
+		useGlobalStore.getState().validateProjectPaths();
+	}, []);
 
 	const handleLoadProject = (pathURL: string) => {
 		if (!pathURL) {
@@ -187,7 +190,6 @@ export default function Home() {
 									text-3xl
 									"
 								>
-									
 									{project.name}
 								</div>
 							))

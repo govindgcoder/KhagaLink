@@ -4,7 +4,7 @@ pub fn run() {
         tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
-        .invoke_handler(tauri::generate_handler![create_project, get_csv_metadata, get_csv_rows, load_project, save_project])
+        .invoke_handler(tauri::generate_handler![create_project, get_csv_metadata, get_csv_rows, load_project, save_project, delete_project, check_path_exists])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -114,4 +114,17 @@ fn save_project(project: Project)-> Result<(), String>{
 	let file_path = Path::new(&project.path).join("project.json");
     fs::write(file_path, json_data).map_err(|e| e.to_string())?;
 	Ok(())
+}
+
+#[tauri::command]
+fn delete_project(path: String)-> Result<(), String>{
+	let file_path = Path::new(&path).join("project.json");
+    fs::remove_file(file_path).map_err(|e| e.to_string())?;
+	Ok(())
+}
+
+#[tauri::command]
+fn check_path_exists(path: String)-> bool {
+	let file_path = Path::new(&path).join("project.json");
+	return file_path.exists();
 }

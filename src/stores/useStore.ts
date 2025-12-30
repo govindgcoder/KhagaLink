@@ -21,6 +21,7 @@ interface ProjectList {
 	projects: Project[];
 	addProject: (project: Project) => void;
 	deleteProject: (path: string) => void;
+	validateProjectPaths: (project: Project) => void;
 }
 
 interface ProjectState {
@@ -64,9 +65,31 @@ export const useGlobalStore = create<ProjectList>()(
 				set({ projects: [...get().projects, project] });
 			},
 			/* create a new project array without the given project based on it's path */
-			deleteProject: (path: string) => {
-				set({projects: get().projects.filter((project) => project.path !== path)})
-			}
+			deleteProject: async (path: string) => {
+				const response = await invoke("delete_project", { path: path });
+				if (response === "success") {
+					set({
+						projects: get().projects.filter(
+							(project) => project.path !== path,
+						),
+					});
+				}
+			},
+
+			validateProjectPaths: async () => {
+				for (const project of get().projects) {
+					const response = await invoke("check_path_exists", {
+						path: project.path,
+					});
+					if (response == false) {
+						set({
+							projects: get().projects.filter(
+								(p) => p.path !== project.path,
+							),
+						});
+					}
+				}
+			},
 		}),
 		{
 			name: "project-list-storage",
@@ -198,12 +221,12 @@ export const useProjectStore = create<ProjectState>()(
 					project: updated_project,
 				});
 			},
-			
+
 			delCsvFromList: async (path: string) => {
 				const current_project = get().current_project;
 				if (!current_project) return;
 				const updated_csv_files = current_project.csv_files.filter(
-					(csvPath) => csvPath.path !== path
+					(csvPath) => csvPath.path !== path,
 				);
 				const updated_project = {
 					...current_project,
