@@ -7,7 +7,7 @@ import { useGlobalStore, useProjectStore } from "../stores/useStore";
 export default function Home() {
 	const [isNewProject, setIsNewProject] = useState(false);
 	const [isLoadProject, setIsLoadProject] = useState(false);
-
+	
 	const [path, setPath] = useState("");
 
 	const projectList = useGlobalStore((state) => state.projects);
@@ -17,7 +17,9 @@ export default function Home() {
 	const loadProject = useProjectStore((state) => state.loadProject);
 
 	useEffect(() => {
-		useGlobalStore.getState().validateProjectPaths();
+		useGlobalStore
+			.getState()
+			.validateProjectPaths(useGlobalStore.getState().projects);
 	}, []);
 
 	const handleLoadProject = (pathURL: string) => {
@@ -40,11 +42,32 @@ export default function Home() {
 		if (isLoadProject) return;
 		setIsLoadProject(!isLoadProject);
 	};
+	
+  const [menu, setMenu] = useState({ visible: false, x: 0, y: 0 });
+
+  const handleMenuTrigger = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, path: string) => {
+    if (e.type === 'contextmenu') e.preventDefault();
+    
+    // Set position and show custom menu
+	  setPath(path);
+    setMenu({ visible: true, x: e.pageX, y: e.pageY });
+  };
+
+  const closeMenu = () => setMenu({ ...menu, visible: false });
+
+  // Close menu when clicking anywhere else
+  useEffect(() => {
+    window.addEventListener('click', closeMenu);
+    return () => window.removeEventListener('click', closeMenu);
+  }, []);
 
 	const handleDeleteProject = (path: string) => {
 		deleteProject(path);
 		alert("project deleted");
 		setPath("");
+		useGlobalStore
+			.getState()
+			.validateProjectPaths(useGlobalStore.getState().projects);
 	};
 
 	return (
@@ -55,6 +78,24 @@ export default function Home() {
 			</div>
 		) : (
 			<div className="py-10 px-14 mt-4 " style={{ minWidth: "800px" }}>
+				
+					{ 
+						menu.visible && (
+							<div
+								className="absolute p-4 bg-white text-red-500"
+								style={{left: menu.x, top: menu.y}}
+								
+							>
+								<button 
+									onClick={(e)=>{
+										e.stopPropagation();
+										closeMenu();
+										handleDeleteProject(path)
+									}}
+								>Delete</button>
+							</div>)
+					}
+				
 				<h2 className="text-2xl ml-1 text-violet-300 font-bold">
 					KhagaLink
 				</h2>
@@ -189,6 +230,10 @@ export default function Home() {
 									rounded-2xl
 									text-3xl
 									"
+									
+									onContextMenu={(e)=>handleMenuTrigger(e, project.path)}
+									
+									onClick={() => { handleLoadProject(project.path);}}
 								>
 									{project.name}
 								</div>

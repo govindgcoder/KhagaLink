@@ -21,7 +21,7 @@ interface ProjectList {
 	projects: Project[];
 	addProject: (project: Project) => void;
 	deleteProject: (path: string) => void;
-	validateProjectPaths: (project: Project) => void;
+	validateProjectPaths: (project: Project[]) => void;
 }
 
 interface ProjectState {
