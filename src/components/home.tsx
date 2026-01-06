@@ -73,7 +73,7 @@ export default function Home() {
 	return (
 		// check whether the global store has hydrated
 		!useGlobalStore.persist.hasHydrated() ? (
-			<div className="size-screen justify-center items-center">
+			<div className="size-full justify-center items-center">
 				Loading...
 			</div>
 		) : (

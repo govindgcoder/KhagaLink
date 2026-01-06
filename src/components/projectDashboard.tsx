@@ -19,40 +19,28 @@ export default function ProjectDashboard() {
 	};
 
 	return (
-		<div style={{ height: "100vh" }}>
+		<div className="size-full">
 			<div
-				className="project-dashboard-layout"
-				style={{
-					display: "flex",
-					height: "100vh",
-					gap: "1rem",
-					padding: "1rem",
-				}}
+				className="project-dashboard-layout bg-[var(--secondary-color)] p-4 w-screen h-screen flex"
 			>
-				<div id="sidebar" style={{ height: "100vh" }}>
-					{isSidebarOpen ? (
-						<div
-							style={{
-								width: "4rem",
-								height: "100vh",
-								backgroundColor: "teal",
-							}}
-						>
-							<button onClick={handleToggleSideBar}>-</button>
+				<div id="sidebar" className={`h-full ${isSidebarOpen ? 'w-42' : 'w-12'} bg-[var(--secondary-color)] transition-all mr-3`}>
+					<div className="flex flex-col justify-between h-full">
+						<div className="flex items-center justify-between py-2">
+							<button onClick={handleToggleSideBar}>
+								{isSidebarOpen ? (
+									<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+									</svg>
+								) : (
+									<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6l6 6-6 6" />
+									</svg>
+								)}
+							</button>
 						</div>
-					) : (
-						<div
-							style={{
-								width: "12rem",
-								height: "100vh",
-								backgroundColor: "teal",
-							}}
-						>
-							<button onClick={handleToggleSideBar}>-</button>
-						</div>
-					)}
+					</div>
 				</div>
-				<div id="main-csv-content" style={{ flex: 1 }}>
+				<div id="main-csv-content" className="w-full bg-[var(--background)] flex-1">
 					<CsvVisualizer />
 				</div>
 			</div>

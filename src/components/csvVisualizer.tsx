@@ -20,7 +20,7 @@ export default function CsvVisualizer() {
 	const loadView = useProjectStore((state) => state.load_view);
 
 	const addCsvToList = useProjectStore((state) => state.addCsvToList);
-	
+
 	const delCsvFromList = useProjectStore((state) => state.delCsvFromList);
 
 	// if (!metadata) {
@@ -78,30 +78,23 @@ export default function CsvVisualizer() {
 
 	return (
 		<div
-			className="p-4 border mt-4 flex flex-col gap-4 h-full"
+			className="p-8 flex flex-col gap-4 h-full bg-[var(--background-color)] rounded-xl "
 			style={{ minWidth: "800px" }}
 		>
-			<div>
-				<p>
+			<div className="flex justify-between">
+				<p className="text-3xl">
 					{currentProject !== null
 						? currentProject.name
 						: "No Project"}
 				</p>
+				<button
+					onClick={handleExit}
+					className="size-fit px-2 bg-red-400 rounded-full font-light"
+				>
+					<p className="text-2xl">X</p>
+				</button>
 			</div>
-			<button
-				onClick={handleExit}
-				style={{
-					backgroundColor: "#007BFF",
-					color: "white",
-					padding: "10px 20px",
-					border: "none",
-					borderRadius: "4px",
-					cursor: "pointer",
-					fontFamily: "'Arial', sans-serif",
-				}}
-			>
-				Exit
-			</button>
+			
 			<h2
 				className="text-xl font-bold mb-4"
 				style={{
@@ -142,10 +135,13 @@ export default function CsvVisualizer() {
 						<div
 							key={index}
 							className={`m-4 p-4 flex ${file.path === path ? "bg-blue-500 text-white" : "bg-blue-300"}`}
-							
-						><button className="w-full" onClick={() => setPath(file.path)}>
-							{file.path.replace(/^.*[\\\/]/, "")}
-						</button>
+						>
+							<button
+								className="w-full"
+								onClick={() => setPath(file.path)}
+							>
+								{file.path.replace(/^.*[\\\/]/, "")}
+							</button>
 							<button
 								onClick={() => delCsvFromList(file.path)}
 								className="bg-red-500 px-3 py-1 rounded font-mono"
@@ -153,7 +149,6 @@ export default function CsvVisualizer() {
 								Delete
 							</button>
 						</div>
-						
 					);
 				})}
 			</div>
