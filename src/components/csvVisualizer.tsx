@@ -78,7 +78,7 @@ export default function CsvVisualizer() {
 
 	return (
 		<div
-			className="p-8 flex flex-col gap-4 h-full bg-[var(--background-color)] rounded-xl "
+			className="p-8 flex flex-col gap-4 h-full overflow-hidden bg-[var(--background-color)] rounded-xl "
 			style={{ minWidth: "800px" }}
 		>
 			<div className="flex justify-between">
@@ -94,17 +94,7 @@ export default function CsvVisualizer() {
 					<p className="text-2xl">X</p>
 				</button>
 			</div>
-			
-			<h2
-				className="text-xl font-bold mb-4"
-				style={{
-					fontFamily: "'Arial', sans-serif",
-					fontSize: "24px",
-					color: "#333",
-				}}
-			>
-				CSV Analysis
-			</h2>
+
 			<div className="flex gap-2 m-4">
 				<input
 					type="text"
@@ -134,7 +124,7 @@ export default function CsvVisualizer() {
 					return (
 						<div
 							key={index}
-							className={`m-4 p-4 flex ${file.path === path ? "bg-blue-500 text-white" : "bg-blue-300"}`}
+							className={`m-4 p-4 flex ${file.path === path ? "bg-blue-500 text-white" : "bg-[var(--secondary-color)]"}`}
 						>
 							<button
 								className="w-full"
@@ -144,7 +134,7 @@ export default function CsvVisualizer() {
 							</button>
 							<button
 								onClick={() => delCsvFromList(file.path)}
-								className="bg-red-500 px-3 py-1 rounded font-mono"
+								className="bg-red-500 text-gray-200 px-3 py-1 rounded font-semibold"
 							>
 								Delete
 							</button>
@@ -165,13 +155,13 @@ export default function CsvVisualizer() {
 				Columns: {metadata ? metadata.headers.length : 0}
 			</p>
 
-			{/*<ul className="list-disc pl-5">
+			<ul className="list-disc pl-5">
 				{metadata
 					? metadata.headers.map((header, index) => (
 							<li key={index}>{header}</li>
 						))
 					: null}
-			</ul>*/}
+			</ul>
 			<div style={{ display: "flex", justifyContent: "space-between" }}>
 				<button
 					onClick={handlePrev}
@@ -203,23 +193,26 @@ export default function CsvVisualizer() {
 				</button>
 			</div>
 			<div
-				className="flex overflow-y-auto h-full"
+				className="flex flex-1 w-full block"
 				style={{
-					maxHeight: "70vh",
 					overflow: "auto",
 					border: "1px solid black",
 					borderRadius: "4px",
 					padding: "8px",
 				}}
 			>
-				<table style={{ borderCollapse: "collapse", width: "100%" }}>
+				<table
+					style={{
+						borderCollapse: "collapse",
+					}}
+				>
 					<thead>
 						<tr>
 							{metadata?.headers.map((header, index) => (
 								<th
 									key={index}
+									className="sticky top-0 bg-gray-700"
 									style={{
-										border: "1px solid black",
 										padding: "8px",
 										textAlign: "left",
 									}}
