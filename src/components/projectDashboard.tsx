@@ -23,7 +23,7 @@ export default function ProjectDashboard() {
 			<div
 				className="project-dashboard-layout bg-[var(--secondary-color)] p-4 w-screen h-screen flex"
 			>
-				<div id="sidebar" className={`h-full ${isSidebarOpen ? 'w-44' : 'w-12'} bg-[var(--secondary-color)] transition-all mr-3`}>
+				<div id="sidebar" className={`h-full ${isSidebarOpen ? 'w-42' : 'w-12'} bg-[var(--secondary-color)] transition-all mr-3`}>
 					<div className="flex flex-col justify-between h-full">
 						<div className="flex items-center justify-between py-2">
 							<button onClick={handleToggleSideBar}>
@@ -40,7 +40,7 @@ export default function ProjectDashboard() {
 						</div>
 					</div>
 				</div>
-				<div id="main-csv-content" className="w-full bg-[var(--background)] h-full flex-1">
+				<div id="main-csv-content" className="w-full bg-[var(--background)] flex-1">
 					<CsvVisualizer />
 				</div>
 			</div>
