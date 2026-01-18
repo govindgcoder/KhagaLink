@@ -40,7 +40,7 @@ export default function ProjectDashboard() {
                             <div className="flex items-center justify-start py-2">
                                 <button
                                     type="button"
-                                    className="mr-2 p-1 rounded hover:bg-white/10 active:scale-95 transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-white/30"
+                                    className="mx-2 p-1 rounded hover:bg-white/10 active:scale-95 transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-white/30"
                                     onClick={handleToggleSideBar}
                                     aria-label={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
                                 >
@@ -83,14 +83,18 @@ export default function ProjectDashboard() {
                             <div className="mt-8 flex flex-col gap-3 px-1">
                                 <button
                                     type="button"
-                                    className="border border-white w-full text-xl rounded py-2 hover:bg-white/5 transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-white/20"
+                                    className="
+                                    bg-[var(--background-color)]
+                             w-full text-xl rounded py-2 hover:bg-white/5 transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-white/20"
                                     onClick={() => setSelectedTab("csv")}
                                 >
                                     csv
                                 </button>
                                 <button
                                     type="button"
-                                    className="border border-white w-full text-xl rounded py-2 hover:bg-white/5 transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-white/20"
+                                    className="
+                                    bg-[var(--background-color)]
+                         w-full text-xl rounded py-2 hover:bg-white/5 transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-white/20"
                                     onClick={() => setSelectedTab("tele")}
                                 >
                                     tele
@@ -99,7 +103,7 @@ export default function ProjectDashboard() {
                         </div>
                         <button
                             type="button"
-                            className="mb-2 border border-red-200 rounded transition-colors duration-150 ease-in-out hover:bg-red-600/10 focus:outline-none focus:ring-2 focus:ring-red-300"
+                            className="py-1 border border-[#944656] rounded transition-colors duration-150 ease-in-out hover:bg-red-600/10 focus:outline-none focus:ring-2 focus:ring-red-300"
                             onClick={handleExit}
                         >
                             {isSidebarOpen ? (
