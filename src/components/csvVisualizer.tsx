@@ -105,7 +105,7 @@ export default function CsvVisualizer() {
                     return (
                         <div
                             key={index}
-                            className={`m-4 p-4 flex ${file.path === path ? "bg-blue-500 text-white" : "bg-blue-300"}`}
+                            className={` p-4 flex ${file.path === path ? "bg-blue-500 text-white" : "bg-blue-300"}`}
                         >
                             <button
                                 className="w-full"

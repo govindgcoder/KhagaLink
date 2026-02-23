@@ -4,7 +4,7 @@ pub fn run() {
         tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
-        .invoke_handler(tauri::generate_handler![create_project, get_csv_metadata, get_csv_rows, load_project, save_project, delete_project, check_path_exists])
+        .invoke_handler(tauri::generate_handler![create_project, get_csv_metadata, get_csv_rows, load_project, save_project, delete_project, check_path_exists, get_graph_data])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -67,6 +67,45 @@ fn read_metadata(path:&str)->Result<CSVmetadata, Box<dyn Error>>{
             headers, total_rows
         }
     )
+}
+
+#[derive(Serialize)]
+struct GraphPoint {
+    x: f64,
+    y: f64,
+}
+
+
+#[tauri::command]
+fn get_graph_data(path: String, x_col: usize, y_col: usize, max_points: usize) -> Result<Vec<GraphPoint>, String> {
+    let mut rdr = csv::Reader::from_path(&path).map_err(|e| e.to_string())?;
+    
+    // need to be optimized later
+    let records: Vec<csv::StringRecord> = rdr.records().collect::<Result<_, _>>().map_err(|e| e.to_string())?;
+    let total_rows = records.len();
+
+    let step = if total_rows > max_points {
+        total_rows / max_points
+    } else {
+        1
+    };
+
+    let mut points = Vec::new();
+
+    for (i, record) in records.iter().enumerate() {
+        if i % step == 0 {
+            // get strings, default val will be 0
+            let x_str = record.get(x_col).unwrap_or("0");
+            let y_str = record.get(y_col).unwrap_or("0");
+
+            let x_val = x_str.parse::<f64>().unwrap_or(0.0);
+            let y_val = y_str.parse::<f64>().unwrap_or(0.0);
+
+            points.push(GraphPoint { x: x_val, y: y_val });
+        }
+    }
+
+    Ok(points)
 }
 
 #[tauri::command]
