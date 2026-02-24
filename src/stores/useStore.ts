@@ -24,6 +24,15 @@ interface ProjectList {
 	validateProjectPaths: (project: Project[]) => void;
 }
 
+
+export interface GraphWidget {
+  id: string;
+  x_col_idx: number;
+  y_col_idx: number;
+  name: string;
+  data : {x: number, y: number}[];
+}
+
 interface ProjectState {
 	current_view: view | null;
 	load_view: (view: view) => void;
@@ -32,7 +41,7 @@ interface ProjectState {
 	currentCSVmetadata: CSVmetadata | null;
 	createProject: (path: string, name: string) => Promise<void>;
 	loadCSVmetadata: (path: string) => Promise<void>;
-
+  
 	currentCSVrows: string[][] | null;
 	loadCSVrows: (
 		path: string,
@@ -42,12 +51,20 @@ interface ProjectState {
 	loadProject: (path: string) => Promise<void>;
 	addCsvToList: (path: string) => Promise<void>;
 	delCsvFromList: (path: string) => Promise<void>;
+
+  activeGraphs: GraphWidget[];
+  addGraphWidget: () => void;
+  removeGraphWidget: (id: string) => void;
+  updateGraphData: (id: string, xCol: number, yCol: number) => Promise<void>;
+
+
 }
 
 interface CSVmetadata {
 	headers: string[];
 	total_rows: number;
 }
+
 
 export const useGlobalStore = create<ProjectList>()(
 	persist(
