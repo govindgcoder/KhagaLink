@@ -78,8 +78,7 @@ export default function CsvVisualizer() {
     return (
         <div
             className="p-8 flex flex-col gap-4 h-full bg-[var(--background-color)] rounded-xl overflow-y-auto hide-scrollbar"
-            style={{
-                minWidth: "800px",
+            style={{    
                 msOverflowStyle: "none", // IE and Edge
                 scrollbarWidth: "none", // Firefox
             }}
@@ -117,8 +116,8 @@ export default function CsvVisualizer() {
                             key={index}
                             className={`p-3 flex justify-between items-center rounded ${
                                 file.path === path
-                                    ? "bg-blue-500 text-white"
-                                    : "bg-blue-100 text-slate-800"
+                                    ? "bg-blue-300 text-white"
+                                    : "bg-blue-400 text-slate-100"
                             }`}
                         >
                             <button
@@ -161,19 +160,19 @@ export default function CsvVisualizer() {
                 </div>
 
                 <div
-                    className="border border-slate-300 rounded shadow-sm overflow-auto bg-white w-full"
-                    style={{ height: "400px" }} // Explicit fixed height for the table window
+                    className="border border-slate-300 rounded shadow-sm overflow-auto bg-gray-500 w-full"
+                    style={{ height: "400px" }}
                 >
                     <table
-                        style={{ borderCollapse: "collapse", width: "100%" }}
+                        className="min-w-full"
+                        style={{ borderCollapse: "collapse"}}
                     >
-                        {/* Sticky header + solid background so data doesn't bleed through when scrolling */}
-                        <thead className="bg-slate-100 sticky top-0 shadow-sm z-10">
+                        <thead className="bg-gray-500 sticky top-0 shadow-sm z-10">
                             <tr>
                                 {metadata?.headers.map((header, index) => (
                                     <th
                                         key={index}
-                                        className="border border-slate-300 p-2 text-left text-slate-700 whitespace-nowrap"
+                                        className="border border-slate-300 p-2 text-left text-slate-100 whitespace-nowrap"
                                     >
                                         {header}
                                     </th>
@@ -184,12 +183,12 @@ export default function CsvVisualizer() {
                             {currentCSVrows?.map((row, rowIndex) => (
                                 <tr
                                     key={rowIndex}
-                                    className="hover:bg-slate-50"
+                                    className="hover:bg-blue-300"
                                 >
                                     {row.map((cell, cellIndex) => (
                                         <td
                                             key={cellIndex}
-                                            className="border border-slate-300 p-2 text-slate-600 whitespace-nowrap"
+                                            className="border border-slate-300 p-2 text-gray-200 whitespace-nowrap"
                                         >
                                             {cell}
                                         </td>
@@ -204,7 +203,7 @@ export default function CsvVisualizer() {
             <div className="flex flex-col mt-4 border-t border-slate-300 pt-4">
                 <div className="flex justify-between items-center mb-4 shrink-0">
                     <h2 className="text-2xl font-bold text-slate-50">
-                        Telemetry Graphs
+                        Graphs
                     </h2>
                     <button
                         onClick={addGraphWidget}
@@ -214,7 +213,7 @@ export default function CsvVisualizer() {
                     </button>
                 </div>
 
-                <div className="flex flex-col gap-6 pr-2 pb-10">
+                <div className="flex flex-col gap-6 pr-2 pb-10 overflow-auto">
                     {activeGraphs.map((widget) => (
                         <GraphWidgetComponent
                             key={widget.id}
