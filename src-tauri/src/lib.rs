@@ -25,8 +25,8 @@ pub struct CsvFileConfig {
 }
 
 use std::path::Path;
-
 use std::fs;
+
 #[tauri::command]
 fn create_project(path: String, name: String) -> Result<String, String> {
     let new_project = Project {
@@ -80,7 +80,7 @@ struct GraphPoint {
 fn get_graph_data(path: String, x_col: usize, y_col: usize, max_points: usize) -> Result<Vec<GraphPoint>, String> {
     let mut rdr = csv::Reader::from_path(&path).map_err(|e| e.to_string())?;
     
-    // need to be optimized later
+    // !!! need to be optimized later
     let records: Vec<csv::StringRecord> = rdr.records().collect::<Result<_, _>>().map_err(|e| e.to_string())?;
     let total_rows = records.len();
 

@@ -6,264 +6,312 @@ import { createJSONStorage } from "zustand/middleware";
 type view = "Home" | "Project";
 
 interface CsvFileConfig {
-	path: string;
-	is_visible: boolean;
+    path: string;
+    is_visible: boolean;
 }
 
 interface Project {
-	name: string;
-	path: string;
-	created_at: string;
-	csv_files: CsvFileConfig[];
+    name: string;
+    path: string;
+    created_at: string;
+    csv_files: CsvFileConfig[];
 }
 
 interface ProjectList {
-	projects: Project[];
-	addProject: (project: Project) => void;
-	deleteProject: (path: string) => void;
-	validateProjectPaths: (project: Project[]) => void;
+    projects: Project[];
+    addProject: (project: Project) => void;
+    deleteProject: (path: string) => void;
+    validateProjectPaths: (project: Project[]) => void;
 }
 
-
 export interface GraphWidget {
-  id: string;
-  x_col_idx: number;
-  y_col_idx: number;
-  name: string;
-  data : {x: number, y: number}[];
+    id: string;
+    x_col_idx: number;
+    y_col_idx: number;
+    name: string;
+    data: { x: number; y: number }[];
 }
 
 interface ProjectState {
-	current_view: view | null;
-	load_view: (view: view) => void;
-	current_project: Project | null;
-	error: any | null;
-	currentCSVmetadata: CSVmetadata | null;
-	createProject: (path: string, name: string) => Promise<void>;
-	loadCSVmetadata: (path: string) => Promise<void>;
-  
-	currentCSVrows: string[][] | null;
-	loadCSVrows: (
-		path: string,
-		start_size: number,
-		window_size: number,
-	) => Promise<void>;
-	loadProject: (path: string) => Promise<void>;
-	addCsvToList: (path: string) => Promise<void>;
-	delCsvFromList: (path: string) => Promise<void>;
+    current_view: view | null;
+    load_view: (view: view) => void;
+    current_project: Project | null;
+    error: any | null;
+    currentCSVmetadata: CSVmetadata | null;
+    createProject: (path: string, name: string) => Promise<void>;
+    loadCSVmetadata: (path: string) => Promise<void>;
 
-  activeGraphs: GraphWidget[];
-  addGraphWidget: () => void;
-  removeGraphWidget: (id: string) => void;
-  updateGraphData: (id: string, xCol: number, yCol: number) => Promise<void>;
+    currentCSVrows: string[][] | null;
+    loadCSVrows: (
+        path: string,
+        start_size: number,
+        window_size: number,
+    ) => Promise<void>;
+    loadProject: (path: string) => Promise<void>;
+    addCsvToList: (path: string) => Promise<void>;
+    delCsvFromList: (path: string) => Promise<void>;
 
-
+    activeGraphs: GraphWidget[];
+    addGraphWidget: () => void;
+    removeGraphWidget: (id: string) => void;
+    updateGraphData: (
+        id: string,
+        xCol: number,
+        yCol: number,
+        targetCsvPath: string,
+    ) => Promise<void>;
 }
 
 interface CSVmetadata {
-	headers: string[];
-	total_rows: number;
+    headers: string[];
+    total_rows: number;
 }
 
-
 export const useGlobalStore = create<ProjectList>()(
-	persist(
-		(set, get) => ({
-			// initial state
-			projects: [],
+    persist(
+        (set, get) => ({
+            // initial state
+            projects: [],
 
-			//action to update the state
-			addProject: (project: Project) => {
-				for (const existingProject of get().projects) {
-					if (existingProject.path === project.path) {
-						return;
-					}
-				}
-				set({ projects: [...get().projects, project] });
-			},
-			/* create a new project array without the given project based on it's path */
-			deleteProject: async (path: string) => {
-				const response = await invoke("delete_project", { path: path });
-				if (response === "success") {
-					set({
-						projects: get().projects.filter(
-							(project) => project.path !== path,
-						),
-					});
-				}
-			},
+            //action to update the state
+            addProject: (project: Project) => {
+                for (const existingProject of get().projects) {
+                    if (existingProject.path === project.path) {
+                        return;
+                    }
+                }
+                set({ projects: [...get().projects, project] });
+            },
+            /* create a new project array without the given project based on it's path */
+            deleteProject: async (path: string) => {
+                const response = await invoke("delete_project", { path: path });
+                set({
+                    projects: get().projects.filter(
+                        (project) => project.path !== path,
+                    ),
+                });
+            },
 
-			validateProjectPaths: async () => {
-				for (const project of get().projects) {
-					const response = await invoke("check_path_exists", {
-						path: project.path,
-					});
-					if (response == false) {
-						set({
-							projects: get().projects.filter(
-								(p) => p.path !== project.path,
-							),
-						});
-					}
-				}
-			},
-		}),
-		{
-			name: "project-list-storage",
-			storage: createJSONStorage(() => localStorage),
-		},
-	),
+            validateProjectPaths: async () => {
+                for (const project of get().projects) {
+                    const response = await invoke("check_path_exists", {
+                        path: project.path,
+                    });
+                    if (response == false) {
+                        set({
+                            projects: get().projects.filter(
+                                (p) => p.path !== project.path,
+                            ),
+                        });
+                    }
+                }
+            },
+        }),
+        {
+            name: "project-list-storage",
+            storage: createJSONStorage(() => localStorage),
+        },
+    ),
 );
 
 export const useProjectStore = create<ProjectState>()(
-	persist(
-		(set, get) => ({
-			current_view: "Home",
-			load_view: (view: view) => set({ current_view: view }),
+    persist(
+        (set, get) => ({
+            current_view: "Home",
+            load_view: (view: view) => set({ current_view: view }),
 
-			current_project: null,
-			error: null,
+            current_project: null,
+            error: null,
 
-			createProject: async (path: string, name: string) => {
-				try {
-					const existingProject = useGlobalStore
-						.getState()
-						.projects.find((project) => project.path === path);
+            currentCSVmetadata: null,
 
-					if (existingProject) {
-						set({ current_project: existingProject, error: null });
-						alert("A project already exists here!");
-						return;
-					}
+            createProject: async (path: string, name: string) => {
+                try {
+                    const existingProject = useGlobalStore
+                        .getState()
+                        .projects.find((project) => project.path === path);
 
-					const response = await invoke("create_project", {
-						path: path,
-						name: name,
-					});
+                    if (existingProject) {
+                        set({ current_project: existingProject, error: null });
+                        alert("A project already exists here!");
+                        return;
+                    }
 
-					const new_project: Project = {
-						name: name,
-						path: path.endsWith("/project.json")
-							? path.replace("/project.json", "")
-							: path,
-						created_at: new Date().toString(),
-						csv_files: [],
-					};
+                    const response = await invoke("create_project", {
+                        path: path,
+                        name: name,
+                    });
 
-					set({ current_project: new_project, error: null });
-					useGlobalStore.getState().addProject(new_project);
-					console.log(response);
-				} catch (err) {
-					console.error("Failed to create a new project", err);
-					set({ error: err });
-				}
-			},
+                    const new_project: Project = {
+                        name: name,
+                        path: path.endsWith("/project.json")
+                            ? path.replace("/project.json", "")
+                            : path,
+                        created_at: new Date().toString(),
+                        csv_files: [],
+                    };
 
-			currentCSVmetadata: null,
+                    set({ current_project: new_project, error: null });
+                    useGlobalStore.getState().addProject(new_project);
+                    console.log(response);
+                } catch (err) {
+                    console.error("Failed to create a new project", err);
+                    set({ error: err });
+                }
+            },
 
-			loadCSVmetadata: async (path: string) => {
-				try {
-					const new_csv_metadata = await invoke<CSVmetadata>(
-						"get_csv_metadata",
-						{ path },
-					);
+            loadCSVmetadata: async (path: string) => {
+                try {
+                    const new_csv_metadata = await invoke<CSVmetadata>(
+                        "get_csv_metadata",
+                        { path },
+                    );
 
-					set({ currentCSVmetadata: new_csv_metadata, error: null });
-					console.log("Recieved: ", new_csv_metadata);
-				} catch (err) {
-					console.log("Error in loading csv metadata: ", err);
-					set({ error: err });
-				}
-			},
+                    set({ currentCSVmetadata: new_csv_metadata, error: null });
+                } catch (err) {
+                    console.log("Error in loading csv metadata: ", err);
+                    set({ error: err });
+                }
+            },
 
-			currentCSVrows: null,
+            currentCSVrows: null,
 
-			loadCSVrows: async (
-				path: string,
-				start_index: number,
-				window_size: number,
-			) => {
-				try {
-					const current_rows = await invoke<string[][]>(
-						"get_csv_rows",
-						{
-							path: path,
-							startIndex: start_index,
-							windowSize: window_size,
-						},
-					);
-					set({ currentCSVrows: current_rows, error: null });
-					console.log(
-						"csv rows recieved!",
-						start_index,
-						":",
-						window_size,
-					);
-				} catch (err) {
-					console.error("Error in loading csv rows: ", err);
-					set({ error: err });
-				}
-			},
+            loadCSVrows: async (
+                path: string,
+                start_size: number,
+                window_size: number,
+            ) => {
+                try {
+                    const current_rows = await invoke<string[][]>(
+                        "get_csv_rows",
+                        {
+                            path: path,
+                            startIndex: start_size,
+                            windowSize: window_size,
+                        },
+                    );
+                    set({ currentCSVrows: current_rows, error: null });
+                } catch (err) {
+                    console.error("Error in loading csv rows: ", err);
+                    set({ error: err });
+                }
+            },
 
-			loadProject: async (path: string) => {
-				try {
-					set({ currentCSVmetadata: null, currentCSVrows: null });
-					const project = await invoke<Project>("load_project", {
-						path: `${path}/project.json`,
-					});
-					set({ current_project: project });
-				} catch (err) {
-					console.error("File not found: ", err);
-				}
-			},
+            loadProject: async (path: string) => {
+                try {
+                    set({ currentCSVmetadata: null, currentCSVrows: null });
+                    const project = await invoke<Project>("load_project", {
+                        path: `${path}/project.json`,
+                    });
+                    set({ current_project: project });
+                } catch (err) {
+                    console.error("File not found: ", err);
+                }
+            },
 
-			addCsvToList: async (path: string) => {
-				const current_project = get().current_project;
-				if (!current_project) return;
-				for (const csvPath of current_project.csv_files) {
-					if (csvPath.path === path) return;
-				}
-				const updated_csv_files = [
-					...current_project.csv_files,
-					{ path: path, is_visible: true },
-				];
-				const updated_project = {
-					...current_project,
-					csv_files: updated_csv_files,
-				};
-				set({
-					current_project: updated_project,
-				});
-				await invoke("save_project", {
-					project: updated_project,
-				});
-			},
+            addCsvToList: async (path: string) => {
+                const current_project = get().current_project;
+                if (!current_project) return;
 
-			delCsvFromList: async (path: string) => {
-				const current_project = get().current_project;
-				if (!current_project) return;
-				const updated_csv_files = current_project.csv_files.filter(
-					(csvPath) => csvPath.path !== path,
-				);
-				const updated_project = {
-					...current_project,
-					csv_files: updated_csv_files,
-				};
-				set({
-					current_project: updated_project,
-				});
-				await invoke("save_project", {
-					project: updated_project,
-				});
-			},
-		}),
-		{
-			name: "project-store",
-			storage: createJSONStorage(() => localStorage),
-			partialize: (state) => ({
-				current_project: state.current_project,
-				// Optionally, persist other fields as needed
-			}),
-		},
-	),
+                for (const csvPath of current_project.csv_files) {
+                    if (csvPath.path === path) return;
+                }
+
+                const updated_project = {
+                    ...current_project,
+                    csv_files: [
+                        ...current_project.csv_files,
+                        { path, is_visible: true },
+                    ],
+                };
+
+                set({ current_project: updated_project });
+                await invoke("save_project", { project: updated_project });
+            },
+
+            delCsvFromList: async (path: string) => {
+                const current_project = get().current_project;
+                if (!current_project) return;
+
+                const updated_project = {
+                    ...current_project,
+                    csv_files: current_project.csv_files.filter(
+                        (csvPath) => csvPath.path !== path,
+                    ),
+                };
+
+                set({ current_project: updated_project });
+                await invoke("save_project", { project: updated_project });
+            },
+
+            activeGraphs: [],
+
+            addGraphWidget: () => {
+                const newGraph: GraphWidget = {
+                    id: crypto.randomUUID(),
+                    x_col_idx: 0,
+                    y_col_idx: 0,
+                    name: "New Graph",
+                    data: [],
+                };
+
+                set({ activeGraphs: [...get().activeGraphs, newGraph] });
+            },
+
+            removeGraphWidget: (id: string) => {
+                set({
+                    activeGraphs: get().activeGraphs.filter(
+                        (graph) => graph.id !== id,
+                    ),
+                });
+            },
+
+            updateGraphData: async (
+                id: string,
+                xCol: number,
+                yCol: number,
+                targetCsvPath: string,
+            ) => {
+                // update the dropdowns IMMEDIATELY
+                set({
+                    activeGraphs: get().activeGraphs.map((g) =>
+                        g.id === id ? { ...g, x_col_idx: xCol, y_col_idx: yCol } : g
+                    ),
+                });
+            
+                //if there is no file selected
+                if (!targetCsvPath) return;
+            
+                // fetch the data from Rust in the background
+                try {
+                    const data = await invoke<{ x: number; y: number }[]>(
+                        "get_graph_data",
+                        {
+                            path: targetCsvPath,
+                            xCol,
+                            yCol,
+                            maxPoints: 2000,
+                        },
+                    );
+            
+                    // update the graph with the new data points once Rust is done
+                    set({
+                        activeGraphs: get().activeGraphs.map((g) =>
+                            g.id === id ? { ...g, data } : g
+                        ),
+                    });
+                } catch (e) {
+                    console.error("Graph error from Rust:", e);
+                }
+            },
+        }),
+        {
+            name: "project-store",
+            storage: createJSONStorage(() => localStorage),
+            partialize: (state) => ({
+                current_project: state.current_project,
+                activeGraphs: state.activeGraphs,
+            }),
+        },
+    ),
 );
