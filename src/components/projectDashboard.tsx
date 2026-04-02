@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import CsvVisualizer from "./csvVisualizer";
+import Telemetry from "./telemetry"
 import { useProjectStore } from "../stores/useStore";
 
 export default function ProjectDashboard() {
@@ -76,9 +77,9 @@ export default function ProjectDashboard() {
                                 </button>
                                 <button
                                     type="button"
-                                    className="
+                                    className={`
                                     bg-[var(--background-color)]
-                         w-full text-xl rounded py-2 hover:bg-white/5 transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-white/20"
+                         w-full text-xl rounded py-2 hover:bg-white/5 transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-white/20`}
                                     onClick={() => setSelectedTab("tele")}
                                 >
                                     tele
@@ -91,7 +92,9 @@ export default function ProjectDashboard() {
                     id="main-csv-content"
                     className="w-full bg-[var(--background)] flex-1 transition-colors duration-150 ease-in-out min-w-0"
                 >
-                    <CsvVisualizer />
+                    {selectedTab == "csv" ?
+                    <CsvVisualizer /> :
+                    <Telemetry/>}
                 </div>
             </div>
         </div>
