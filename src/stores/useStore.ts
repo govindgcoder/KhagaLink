@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { invoke } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
 import { persist } from "zustand/middleware";
 import { createJSONStorage } from "zustand/middleware";
 
@@ -60,6 +61,7 @@ interface ProjectState {
         yCol: number,
         targetCsvPath: string,
     ) => Promise<void>;
+    connectToHardware: (port: string, baud: number) => Promise<void>;
 }
 
 interface CSVmetadata {
@@ -275,13 +277,15 @@ export const useProjectStore = create<ProjectState>()(
                 // update the dropdowns IMMEDIATELY
                 set({
                     activeGraphs: get().activeGraphs.map((g) =>
-                        g.id === id ? { ...g, x_col_idx: xCol, y_col_idx: yCol } : g
+                        g.id === id
+                            ? { ...g, x_col_idx: xCol, y_col_idx: yCol }
+                            : g,
                     ),
                 });
-            
+
                 //if there is no file selected
                 if (!targetCsvPath) return;
-            
+
                 // fetch the data from Rust in the background
                 try {
                     const data = await invoke<{ x: number; y: number }[]>(
@@ -293,15 +297,34 @@ export const useProjectStore = create<ProjectState>()(
                             maxPoints: 2000,
                         },
                     );
-            
+
                     // update the graph with the new data points once Rust is done
                     set({
                         activeGraphs: get().activeGraphs.map((g) =>
-                            g.id === id ? { ...g, data } : g
+                            g.id === id ? { ...g, data } : g,
                         ),
                     });
                 } catch (e) {
                     console.error("Graph error from Rust:", e);
+                }
+            },
+
+            connectToHardware: async (port: string, baud: number) => {
+                try {
+                    // to start the background thread by Rust
+                    const response = await invoke("start_telemetry_stream", {
+                        portName: port,
+                        baudRate: baud,
+                    });
+                    console.log("Hardware:", response);
+                    alert(response);
+                    // listen to this packet
+                    await listen<string>("telemetry-packet", (event) => {
+                        console.log("LIVE DATA:", event.payload);
+                    });
+                } catch (err) {
+                    console.error("Hardware Connection Failed:", err);
+                    alert(`Hardware Error: ${err}`);
                 }
             },
         }),

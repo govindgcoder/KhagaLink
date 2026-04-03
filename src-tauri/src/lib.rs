@@ -2,9 +2,12 @@
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
         tauri::Builder::default()
+        .manage(TelemetryState {
+            is_running: Arc::new(AtomicBool::new(false)),
+        })
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
-        .invoke_handler(tauri::generate_handler![create_project, get_csv_metadata, get_csv_rows, load_project, save_project, delete_project, check_path_exists, get_graph_data, start_telemetry_stream])
+        .invoke_handler(tauri::generate_handler![create_project, get_csv_metadata, get_csv_rows, load_project, save_project, delete_project, check_path_exists, get_graph_data, start_telemetry_stream, stop_telemetry_stream])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -79,7 +82,7 @@ struct GraphPoint {
 #[tauri::command]
 fn get_graph_data(path: String, x_col: usize, y_col: usize, max_points: usize) -> Result<Vec<GraphPoint>, String> {
     let mut rdr = csv::Reader::from_path(&path).map_err(|e| e.to_string())?;
-    
+
     // !!! need to be optimized later
     let records: Vec<csv::StringRecord> = rdr.records().collect::<Result<_, _>>().map_err(|e| e.to_string())?;
     let total_rows = records.len();
@@ -172,51 +175,67 @@ fn check_path_exists(path: String)-> bool {
 use std::time::Duration;
 use std::thread;
 use std::io::Read;
-use tauri::Emitter;
+use tauri::{Emitter, State, Manager};
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
+
+struct TelemetryState {
+    is_running: Arc<AtomicBool>,
+}
 
 #[tauri::command]
-fn start_telemetry_stream(app_handle: tauri::AppHandle, port_name: String, baud_rate: u32) -> Result<String, String> {
-    // to open the port
+fn start_telemetry_stream(
+    app_handle: tauri::AppHandle,
+    state: State<'_, TelemetryState>,
+    port_name: String,
+    baud_rate: u32
+) -> Result<String, String> {
+    if state.is_running.load(Ordering::Relaxed) {
+        return Err("A connection is already actively running!".to_string());
+    }
+
     let mut port = serialport::new(&port_name, baud_rate)
         .timeout(Duration::from_millis(10))
         .open()
-        .map_err(|e| format!("Failed to open port: {}", e))?;
+        .map_err(|e| format!("Access Denied: Is the port open in another app? ({})", e))?;
 
-    // to spawn a background thread
+    state.is_running.store(true, Ordering::Relaxed);
+
+    let is_running_clone = Arc::clone(&state.is_running);
+
     thread::spawn(move || {
-        let mut serial_buf: Vec<u8> = vec![0; 1024]; // Buffer for incoming bytes
-        let mut packet_buffer = String::new(); // To build full lines of CSV
+        let mut serial_buf: Vec<u8> = vec![0; 1024];
+        let mut packet_buffer = String::new();
 
-        println!("Started listening on {}", port_name);
-
-        loop {
+        while is_running_clone.load(Ordering::Relaxed) {
             match port.read(serial_buf.as_mut_slice()) {
                 Ok(t) if t > 0 => {
-                    // Convert bytes to string
                     let chunk = String::from_utf8_lossy(&serial_buf[..t]);
                     packet_buffer.push_str(&chunk);
 
-                    // If we detect a newline, we have a full CSV row/packet!
                     if let Some(newline_idx) = packet_buffer.find('\n') {
                         let full_packet = packet_buffer[..newline_idx].trim().to_string();
-                        
-                        // 3. SHOUT THE DATA TO REACT
                         let _ = app_handle.emit("telemetry-packet", full_packet);
-
-                        // Clear the buffer for the next packet
                         packet_buffer = packet_buffer[newline_idx + 1..].to_string();
                     }
                 }
-                // Ignore timeouts (just means no data arrived this millisecond)
                 Err(ref e) if e.kind() == std::io::ErrorKind::TimedOut => (),
                 Err(e) => {
-                    eprintln!("Serial port error: {:?}", e);
-                    break; // Exit the thread if the input is unplugged
+                    eprintln!("Serial port disconnected: {:?}", e);
+                    break;
                 }
                 _ => {}
             }
         }
+
+        println!("Telemetry thread shut down gracefully.");
     });
 
     Ok(format!("Successfully connected to {}", port_name))
+}
+
+#[tauri::command]
+fn stop_telemetry_stream(state: State<'_, TelemetryState>) -> Result<String, String> {
+    state.is_running.store(false, Ordering::Relaxed);
+    Ok("Disconnect signal sent.".to_string())
 }
