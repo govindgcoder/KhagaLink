@@ -21,7 +21,7 @@ export default function ProjectDashboard() {
         return () => window.removeEventListener("keydown", onKeyDown);
     }, []);
 
-    const handleToggleSideBar = () => {
+    const _handleToggleSideBar = () => {
         setIsSidebarOpen(!isSidebarOpen);
     };
 

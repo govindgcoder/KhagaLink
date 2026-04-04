@@ -69,6 +69,8 @@ interface CSVmetadata {
     total_rows: number;
 }
 
+let unlistenTelemetry: (() => void) | null = null;
+
 export const useGlobalStore = create<ProjectList>()(
     persist(
         (set, get) => ({
@@ -86,7 +88,7 @@ export const useGlobalStore = create<ProjectList>()(
             },
             /* create a new project array without the given project based on it's path */
             deleteProject: async (path: string) => {
-                const response = await invoke("delete_project", { path: path });
+                await invoke("delete_project", { path: path });
                 set({
                     projects: get().projects.filter(
                         (project) => project.path !== path,
@@ -284,7 +286,7 @@ export const useProjectStore = create<ProjectState>()(
                 });
 
                 //if there is no file selected
-                if (!targetCsvPath) return;
+                if (!targetCsvPath || targetCsvPath === "LIVE") return;
 
                 // fetch the data from Rust in the background
                 try {
@@ -310,6 +312,17 @@ export const useProjectStore = create<ProjectState>()(
             },
 
             connectToHardware: async (port: string, baud: number) => {
+                set({
+                    activeGraphs: get().activeGraphs.map((g) => ({
+                        ...g,
+                        data: [],
+                    })),
+                });
+
+                if (unlistenTelemetry) {
+                    unlistenTelemetry();
+                    unlistenTelemetry = null;
+                }
                 try {
                     // to start the background thread by Rust
                     const response = await invoke("start_telemetry_stream", {
@@ -319,9 +332,40 @@ export const useProjectStore = create<ProjectState>()(
                     console.log("Hardware:", response);
                     alert(response);
                     // listen to this packet
-                    await listen<string>("telemetry-packet", (event) => {
-                        console.log("LIVE DATA:", event.payload);
-                    });
+                    unlistenTelemetry = await listen<string>(
+                        "telemetry-packet",
+                        (event) => {
+                            const stringVals = event.payload.split(",");
+                            const parsedValues = stringVals.map((num) =>
+                                parseFloat(num.trim()),
+                            );
+                            const MAX_POINTS = 500;
+
+                            set((state) => {
+                                //for new array
+                                const updatedGraphs = state.activeGraphs.map(
+                                    (graph) => {
+                                        const currentX =
+                                            parsedValues[graph.x_col_idx] || 0;
+                                        const currentY =
+                                            parsedValues[graph.y_col_idx] || 0;
+
+                                        // Create a brand new data array
+                                        const newData = [
+                                            ...graph.data,
+                                            { x: currentX, y: currentY },
+                                        ].slice(-MAX_POINTS);
+
+                                        // Return a brand new graph object
+                                        return { ...graph, data: newData };
+                                    },
+                                );
+
+                                // Return a brand new state object
+                                return { activeGraphs: updatedGraphs };
+                            });
+                        },
+                    );
                 } catch (err) {
                     console.error("Hardware Connection Failed:", err);
                     alert(`Hardware Error: ${err}`);
