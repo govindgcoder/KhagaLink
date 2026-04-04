@@ -21,7 +21,7 @@ export default function ProjectDashboard() {
         return () => window.removeEventListener("keydown", onKeyDown);
     }, []);
 
-    const _handleToggleSideBar = () => {
+    const handleToggleSideBar = () => {
         setIsSidebarOpen(!isSidebarOpen);
     };
 
@@ -41,7 +41,7 @@ export default function ProjectDashboard() {
                             <div className="flex items-center justify-start py-2">
                                 <button
                                     type="button"
-                                    className="mx-2 p-1 rounded hover:bg-white/10 active:scale-95 transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-white/30"
+                                    className="mx-1 p-1 rounded hover:bg-white/10 active:scale-95 transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-white/30"
                                     onClick={handleExit}
                                     aria-label="Exit Project"
                                 >
@@ -64,6 +64,7 @@ export default function ProjectDashboard() {
                                 <p className="text-2xl truncate">
                                     {currentProject ? currentProject.name : "No project"}
                                 </p>
+                               
                             </div>
                             <div className="mt-8 flex flex-col gap-3 px-1">
                                 <button

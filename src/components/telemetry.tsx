@@ -33,6 +33,8 @@ export default function Telemetry() {
             graphListEndRef.current?.scrollIntoView({ behavior: "smooth" });
         }, [activeGraphs.length]);
     
+    const telemetryHeaders = useProjectStore((state) => state.telemetryHeaders);
+    
     return (
         <div
             className="p-8 flex flex-col gap-4 h-full bg-[var(--background-color)] rounded-xl"
@@ -119,15 +121,7 @@ export default function Telemetry() {
                             <GraphWidgetComponent
                                 key={widget.id}
                                 widget={widget}
-                                headers={
-                                    metadata?.headers || [
-                                        "Col 0",
-                                        "Col 1",
-                                        "Col 2",
-                                        "Col 3",
-                                        "Col 4",
-                                    ]
-                                }
+                                headers={telemetryHeaders.length > 0 ? telemetryHeaders : ["Col 0", "Col 1", "Col 2", "Col 3", "Col 4"]}
                                 currentCsvPath={"LIVE"}
                             />
                         ))}

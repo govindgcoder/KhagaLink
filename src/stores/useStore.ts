@@ -62,6 +62,7 @@ interface ProjectState {
         targetCsvPath: string,
     ) => Promise<void>;
     connectToHardware: (port: string, baud: number) => Promise<void>;
+    telemetryHeaders: string[];
 }
 
 interface CSVmetadata {
@@ -128,7 +129,9 @@ export const useProjectStore = create<ProjectState>()(
             error: null,
 
             currentCSVmetadata: null,
-
+            
+            telemetryHeaders: [],
+            
             createProject: async (path: string, name: string) => {
                 try {
                     const existingProject = useGlobalStore
@@ -340,6 +343,12 @@ export const useProjectStore = create<ProjectState>()(
                                 parseFloat(num.trim()),
                             );
                             const MAX_POINTS = 500;
+                            
+                            if (get().telemetryHeaders.length === 0) {
+                                    const inferredHeaders = parsedValues.map((_, i) => `Field ${i}`);
+                                    set({ telemetryHeaders: inferredHeaders });
+                            }
+
 
                             set((state) => {
                                 //for new array
@@ -369,6 +378,7 @@ export const useProjectStore = create<ProjectState>()(
                 } catch (err) {
                     console.error("Hardware Connection Failed:", err);
                     alert(`Hardware Error: ${err}`);
+                    telemetryGraphs: state.telemetryGraphs.map(g => ({ ...g, data: [] }));
                 }
             },
         }),

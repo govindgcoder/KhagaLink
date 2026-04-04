@@ -8,7 +8,7 @@ import {
     Tooltip,
     ResponsiveContainer,
 } from "recharts";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 
 interface GraphWidgetProps {
     widget: GraphWidget;
