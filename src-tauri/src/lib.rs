@@ -175,7 +175,7 @@ fn check_path_exists(path: String)-> bool {
 use std::time::Duration;
 use std::thread;
 use std::io::Read;
-use tauri::{Emitter, State, Manager};
+use tauri::{Emitter, State};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::Arc;
 

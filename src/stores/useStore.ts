@@ -3,6 +3,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { persist } from "zustand/middleware";
 import { createJSONStorage } from "zustand/middleware";
+import Telemetry from "../components/telemetry";
 
 type view = "Home" | "Project";
 
@@ -52,14 +53,18 @@ interface ProjectState {
     addCsvToList: (path: string) => Promise<void>;
     delCsvFromList: (path: string) => Promise<void>;
 
-    activeGraphs: GraphWidget[];
-    addGraphWidget: () => void;
-    removeGraphWidget: (id: string) => void;
+    csvGraphs: GraphWidget[];
+    telemetryGraphs: GraphWidget[];
+    addCsvGraph: () => void;
+    addTelemetryGraph: () => void;
+    removeCsvGraph: (id: string) => void;
+    removeTelemetryGraph: (id: string) => void;
     updateGraphData: (
         id: string,
         xCol: number,
         yCol: number,
         targetCsvPath: string,
+        context: string
     ) => Promise<void>;
     connectToHardware: (port: string, baud: number) => Promise<void>;
     telemetryHeaders: string[];
@@ -129,9 +134,9 @@ export const useProjectStore = create<ProjectState>()(
             error: null,
 
             currentCSVmetadata: null,
-            
+
             telemetryHeaders: [],
-            
+
             createProject: async (path: string, name: string) => {
                 try {
                     const existingProject = useGlobalStore
@@ -251,9 +256,10 @@ export const useProjectStore = create<ProjectState>()(
                 await invoke("save_project", { project: updated_project });
             },
 
-            activeGraphs: [],
+            csvGraphs: [],
+            telemetryGraphs: [],
 
-            addGraphWidget: () => {
+            addCsvGraph: () => {
                 const newGraph: GraphWidget = {
                     id: crypto.randomUUID(),
                     x_col_idx: 0,
@@ -261,62 +267,63 @@ export const useProjectStore = create<ProjectState>()(
                     name: "New Graph",
                     data: [],
                 };
-
-                set({ activeGraphs: [...get().activeGraphs, newGraph] });
+                set({ csvGraphs: [...get().csvGraphs, newGraph] });
             },
 
-            removeGraphWidget: (id: string) => {
+            addTelemetryGraph: () => {
+                const newGraph: GraphWidget = {
+                    id: crypto.randomUUID(),
+                    x_col_idx: 0,
+                    y_col_idx: 0,
+                    name: "New Graph",
+                    data: [],
+                };
+                set({ telemetryGraphs: [...get().telemetryGraphs, newGraph] });
+            },
+
+            removeTelemetryGraph: (id: string) => {
                 set({
-                    activeGraphs: get().activeGraphs.filter(
+                    telemetryGraphs: get().telemetryGraphs.filter(
                         (graph) => graph.id !== id,
                     ),
                 });
             },
 
-            updateGraphData: async (
-                id: string,
-                xCol: number,
-                yCol: number,
-                targetCsvPath: string,
-            ) => {
-                // update the dropdowns IMMEDIATELY
+            removeCsvGraph: (id: string) => {
                 set({
-                    activeGraphs: get().activeGraphs.map((g) =>
-                        g.id === id
-                            ? { ...g, x_col_idx: xCol, y_col_idx: yCol }
-                            : g,
+                    csvGraphs: get().csvGraphs.filter(
+                        (graph) => graph.id !== id,
                     ),
                 });
+            },
 
-                //if there is no file selected
-                if (!targetCsvPath || targetCsvPath === "LIVE") return;
-
-                // fetch the data from Rust in the background
-                try {
-                    const data = await invoke<{ x: number; y: number }[]>(
-                        "get_graph_data",
-                        {
-                            path: targetCsvPath,
-                            xCol,
-                            yCol,
-                            maxPoints: 2000,
-                        },
-                    );
-
-                    // update the graph with the new data points once Rust is done
-                    set({
-                        activeGraphs: get().activeGraphs.map((g) =>
-                            g.id === id ? { ...g, data } : g,
-                        ),
-                    });
-                } catch (e) {
-                    console.error("Graph error from Rust:", e);
-                }
+            updateGraphData: async (id, xCol, yCol, path, context) => {
+              const key = context === "csv" ? "csvGraphs" : "telemetryGraphs";
+            
+              // Optimistically update dropdowns
+              set({
+                [key]: get()[key].map((g) =>
+                  g.id === id ? { ...g, x_col_idx: xCol, y_col_idx: yCol } : g
+                ),
+              });
+            
+              if (!path || path === "LIVE") return;
+            
+              try {
+                const data = await invoke<{ x: number; y: number }[]>("get_graph_data", {
+                  path, xCol, yCol, maxPoints: 2000,
+                });
+                set({
+                  [key]: get()[key].map((g) => g.id === id ? { ...g, data } : g),
+                });
+              } catch (e) {
+                console.error("Graph error:", e);
+              }
             },
 
             connectToHardware: async (port: string, baud: number) => {
                 set({
-                    activeGraphs: get().activeGraphs.map((g) => ({
+                    telemetryGraphs: get().telemetryGraphs.map((g) => ({
                         ...g,
                         data: [],
                     })),
@@ -343,16 +350,17 @@ export const useProjectStore = create<ProjectState>()(
                                 parseFloat(num.trim()),
                             );
                             const MAX_POINTS = 500;
-                            
-                            if (get().telemetryHeaders.length === 0) {
-                                    const inferredHeaders = parsedValues.map((_, i) => `Field ${i}`);
-                                    set({ telemetryHeaders: inferredHeaders });
-                            }
 
+                            if (get().telemetryHeaders.length === 0) {
+                                const inferredHeaders = parsedValues.map(
+                                    (_, i) => `Field ${i}`,
+                                );
+                                set({ telemetryHeaders: inferredHeaders });
+                            }
 
                             set((state) => {
                                 //for new array
-                                const updatedGraphs = state.activeGraphs.map(
+                                const updatedGraphs = state.telemetryGraphs.map(
                                     (graph) => {
                                         const currentX =
                                             parsedValues[graph.x_col_idx] || 0;
@@ -371,14 +379,17 @@ export const useProjectStore = create<ProjectState>()(
                                 );
 
                                 // Return a brand new state object
-                                return { activeGraphs: updatedGraphs };
+                                return { telemetryGraphs: updatedGraphs };
                             });
                         },
                     );
                 } catch (err) {
                     console.error("Hardware Connection Failed:", err);
                     alert(`Hardware Error: ${err}`);
-                    telemetryGraphs: state.telemetryGraphs.map(g => ({ ...g, data: [] }));
+                    telemetryGraphs: state.telemetryGraphs.map((g) => ({
+                        ...g,
+                        data: [],
+                    }));
                 }
             },
         }),
@@ -387,7 +398,7 @@ export const useProjectStore = create<ProjectState>()(
             storage: createJSONStorage(() => localStorage),
             partialize: (state) => ({
                 current_project: state.current_project,
-                activeGraphs: state.activeGraphs,
+                csvGraphs: state.csvGraphs,
             }),
         },
     ),

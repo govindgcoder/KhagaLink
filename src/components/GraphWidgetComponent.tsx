@@ -1,3 +1,4 @@
+//#TODO Work on scrollable graph widget after a certain point is reached.
 import { useProjectStore, GraphWidget } from "../stores/useStore";
 import {
     LineChart,
@@ -14,6 +15,7 @@ interface GraphWidgetProps {
     widget: GraphWidget;
     headers: string[] | undefined;
     currentCsvPath: string | undefined; // the file to target the CSV - conencted to the rust backend
+    context: string;
 }
 
 
@@ -21,10 +23,11 @@ export default function GraphWidgetComponent({
     widget,
     headers,
     currentCsvPath,
+    context,
 }: GraphWidgetProps) {
     const updateGraphData = useProjectStore((state) => state.updateGraphData);
     const removeGraphWidget = useProjectStore(
-        (state) => state.removeGraphWidget,
+        (state) => context=="csv"?state.removeCsvGraph : state.removeTelemetryGraph,
     );
 
     // When the user changes a dropdown, fetch new data
@@ -34,13 +37,13 @@ export default function GraphWidgetComponent({
         const newX = axis === "x" ? newIndex : widget.x_col_idx;
         const newY = axis === "y" ? newIndex : widget.y_col_idx;
 
-        updateGraphData(widget.id, newX, newY, currentCsvPath);
+        updateGraphData(widget.id, newX, newY, currentCsvPath, context);
     };
 
     // Fetch initial data on mount, or when currentCsvPath changes
     useEffect(() => {
         if (currentCsvPath && currentCsvPath !== "LIVE" && widget.data.length === 0) {
-            updateGraphData(widget.id, widget.x_col_idx, widget.y_col_idx, currentCsvPath);
+            updateGraphData(widget.id, widget.x_col_idx, widget.y_col_idx, currentCsvPath, context);
         }
     }, [currentCsvPath]); // We deliberately only run this when the path changes or it mounts
 

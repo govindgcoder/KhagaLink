@@ -21,24 +21,22 @@ export default function Telemetry() {
         closeModal();
     };
 
-    const activeGraphs = useProjectStore((state) => state.activeGraphs);
+    const activeGraphs = useProjectStore((state) => state.telemetryGraphs);
 
-    const addGraphWidget = useProjectStore((state) => state.addGraphWidget);
+    const addGraphWidget = useProjectStore((state) => state.addTelemetryGraph);
 
     const metadata = useProjectStore((state) => state.currentCSVmetadata);
 
     const graphListEndRef = useRef<HTMLDivElement>(null);
-    
+
     useEffect(() => {
-            graphListEndRef.current?.scrollIntoView({ behavior: "smooth" });
-        }, [activeGraphs.length]);
-    
+        graphListEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [activeGraphs.length]);
+
     const telemetryHeaders = useProjectStore((state) => state.telemetryHeaders);
-    
+
     return (
-        <div
-            className="p-8 flex flex-col gap-4 h-full bg-[var(--background-color)] rounded-xl"
-        >
+        <div className="p-8 flex flex-col gap-4 h-full bg-[var(--background-color)] rounded-xl">
             <dialog
                 ref={dialogRef}
                 className="p-0 rounded-xl overflow-hidden bg-slate-700 text-white shadow-2xl backdrop:bg-black/60 place-self-center"
@@ -101,8 +99,7 @@ export default function Telemetry() {
             </div>
 
             <div className="flex w-full gap-4 flex-1 min-h-0">
-                <div className="flex flex-col flex-[5] min-h-0 p-4 border border-slate-800 rounded overflow-hidden"
-                >
+                <div className="flex flex-col flex-[5] min-h-0 p-4 border border-slate-800 rounded overflow-hidden">
                     <div className="flex justify-between items-center mb-4 shrink-0">
                         <button
                             onClick={addGraphWidget}
@@ -111,7 +108,8 @@ export default function Telemetry() {
                             + Add Graph
                         </button>
                     </div>
-                    <div className="flex flex-col gap-4 flex-1 min-h-0 overflow-y-auto pr-2 hide-scrollbar"
+                    <div
+                        className="flex flex-col gap-4 flex-1 min-h-0 overflow-y-auto pr-2 hide-scrollbar"
                         style={{
                             msOverflowStyle: "none", // IE and Edge
                             scrollbarWidth: "none", // Firefox
@@ -121,8 +119,19 @@ export default function Telemetry() {
                             <GraphWidgetComponent
                                 key={widget.id}
                                 widget={widget}
-                                headers={telemetryHeaders.length > 0 ? telemetryHeaders : ["Col 0", "Col 1", "Col 2", "Col 3", "Col 4"]}
+                                headers={
+                                    telemetryHeaders.length > 0
+                                        ? telemetryHeaders
+                                        : [
+                                              "Col 0",
+                                              "Col 1",
+                                              "Col 2",
+                                              "Col 3",
+                                              "Col 4",
+                                          ]
+                                }
                                 currentCsvPath={"LIVE"}
+                                context="telemetry"
                             />
                         ))}
                         {activeGraphs.length === 0 && (

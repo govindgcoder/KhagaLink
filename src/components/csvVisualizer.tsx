@@ -22,9 +22,9 @@ export default function CsvVisualizer() {
 
     const delCsvFromList = useProjectStore((state) => state.delCsvFromList);
 
-    const activeGraphs = useProjectStore((state) => state.activeGraphs);
+    const activeGraphs = useProjectStore((state) => state.csvGraphs);
 
-    const addGraphWidget = useProjectStore((state) => state.addGraphWidget);
+    const addGraphWidget = useProjectStore((state) => state.addCsvGraph);
 
     // if (!metadata) {
     // 	return <div>No CSV loaded</div>;
@@ -220,6 +220,7 @@ export default function CsvVisualizer() {
                             widget={widget}
                             headers={metadata?.headers}
                             currentCsvPath={path}
+                            context="csv"
                         />
                     ))}
                     {activeGraphs.length === 0 && (
