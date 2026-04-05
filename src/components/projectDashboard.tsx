@@ -62,7 +62,7 @@ export default function ProjectDashboard() {
                                         </svg>
                                                                     </button>
                                 <p className="text-2xl truncate">
-                                    {currentProject ? currentProject.name : "No project"}
+                                    {currentProject&&isSidebarOpen ? currentProject.name : ""}
                                 </p>
                                
                             </div>
@@ -86,6 +86,11 @@ export default function ProjectDashboard() {
                                     tele
                                 </button>
                             </div>
+                            
+                        </div>
+                        
+                        <div className="w-full h-full" onClick={handleToggleSideBar}>
+                            
                         </div>
                     </div>
                 </div>

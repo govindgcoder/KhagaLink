@@ -1,6 +1,6 @@
 # 🚀💻 KhagaLink
 
-![Version](https://img.shields.io/badge/version-0.1.0-violet) ![Stack](https://img.shields.io/badge/tech-React_|_Tauri_|_Rust-red) ![License](https://img.shields.io/badge/license-MIT-green)
+![Version](https://img.shields.io/badge/version-0.5.0-violet) ![Stack](https://img.shields.io/badge/tech-React_|_Tauri_|_Rust-red) ![License](https://img.shields.io/badge/license-MIT-green)
 
 > **Mission Control & Telemetry Dashboard for Model Rocketry.**
 
@@ -36,11 +36,11 @@ I am currently finalizing **v0.1**. The roadmap prioritizes core data functional
 ### Phase 1: The Core (Data Analysis)
 
 - [x] **v0.1 (The Archive):** Mission creation system, flight log (CSV) upload & parsing, JSON-based local storage.
-- [ ] **v0.2 (The Visuals):** Interactive line graphs for post-flight analysis. Plotting altitude, velocity, and sensor data from uploaded CSVs.
+- [x] **v0.2 (The Visuals):** Interactive line graphs for post-flight analysis. Plotting altitude, velocity, and sensor data from uploaded CSVs.
 
 ### Phase 2: The Live Link (Real-Time)
 
-- [ ] **v0.5 (Telemetry):** Native integration with **Rust Serialport**. Reading real-time data streams from flight computers (ESP32/STM32).
+- [x] **v0.5 (Telemetry):** Native integration with **Rust Serialport**. Reading real-time data streams from flight computers (ESP32/STM32).
 - [ ] **v0.6 (Live Monitor):** Real-time graphing dashboard with packet loss handling and signal strength monitoring.
 
 ### Phase 3: The Command (GCS)

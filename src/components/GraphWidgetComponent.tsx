@@ -7,7 +7,6 @@ import {
     YAxis,
     CartesianGrid,
     Tooltip,
-    ResponsiveContainer,
 } from "recharts";
 import { useEffect } from "react";
 
@@ -18,7 +17,6 @@ interface GraphWidgetProps {
     context: string;
 }
 
-
 export default function GraphWidgetComponent({
     widget,
     headers,
@@ -26,8 +24,8 @@ export default function GraphWidgetComponent({
     context,
 }: GraphWidgetProps) {
     const updateGraphData = useProjectStore((state) => state.updateGraphData);
-    const removeGraphWidget = useProjectStore(
-        (state) => context=="csv"?state.removeCsvGraph : state.removeTelemetryGraph,
+    const removeGraphWidget = useProjectStore((state) =>
+        context == "csv" ? state.removeCsvGraph : state.removeTelemetryGraph,
     );
 
     // When the user changes a dropdown, fetch new data
@@ -42,10 +40,22 @@ export default function GraphWidgetComponent({
 
     // Fetch initial data on mount, or when currentCsvPath changes
     useEffect(() => {
-        if (currentCsvPath && currentCsvPath !== "LIVE" && widget.data.length === 0) {
-            updateGraphData(widget.id, widget.x_col_idx, widget.y_col_idx, currentCsvPath, context);
+        if (
+            currentCsvPath &&
+            currentCsvPath !== "LIVE" &&
+            widget.data.length === 0
+        ) {
+            updateGraphData(
+                widget.id,
+                widget.x_col_idx,
+                widget.y_col_idx,
+                currentCsvPath,
+                context,
+            );
         }
     }, [currentCsvPath]); // We deliberately only run this when the path changes or it mounts
+
+    const chartWidth = Math.max(100, widget.data.length * 2);
 
     return (
         <div className="bg-[var(--secondary-color)] border border-slate-800 rounded-lg p-4 flex flex-col gap-4 shadow-lg h-[400px] shrink-0">
@@ -94,56 +104,63 @@ export default function GraphWidgetComponent({
                 </button>
             </div>
 
-            <div className="flex-1 w-full h-128 min-h-0">
+            <div className="flex-1 w-full min-h-0">
                 {widget.data.length === 0 ? (
                     <div className="h-full w-full flex items-center justify-center text-slate-500 font-mono">
                         Select columns to load data...
                     </div>
                 ) : (
-                    <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={widget.data}>
-                            <CartesianGrid
-                                strokeDasharray="3 3"
-                                stroke="#2d2d35"
-                            />
-
-                            {/* map x keys from graph point */}
-                            <XAxis 
-                                type="number" 
-                                dataKey="x" 
-                                domain={['dataMin', 'dataMax']} 
-                                stroke="#6c71c4" 
-                                tick={{ fill: '#6c71c4', fontSize: 12 }} 
-                                tickFormatter={(tick) => tick.toFixed(2)} 
-                            />
-                            
-                            <YAxis 
-                                type="number"
-                                domain={['auto', 'auto']} 
-                                stroke="#6c71c4" 
-                                tick={{ fill: '#6c71c4', fontSize: 12 }} 
-                        />
-
-                            <Tooltip
-                                contentStyle={{
-                                    backgroundColor: "#1a1a1e",
-                                    borderColor: "#2d2d35",
-                                    color: "#f8fafc",
-                                }}
-                                itemStyle={{ color: "#8b5cf6" }}
-                            />
-
-                            {/*map the y keys*/}
-                            <Line
-                                type="monotone"
-                                dataKey="y"
-                                stroke="#8b5cf6" // Primary Violet
-                                strokeWidth={2}
-                                dot={false} // hid dots for performance
-                                isAnimationActive={false}
-                            />
-                        </LineChart>
-                    </ResponsiveContainer>
+                    <div className="w-full h-full overflow-x-auto">
+                        <div
+                            className="overflow-x-auto"
+                            style={{
+                                height: "100%",
+                                scrollbarWidth: "thin",
+                                scrollbarColor: "#6c71c4 transparent",
+                            }}
+                        >
+                            <LineChart
+                                width={chartWidth}
+                                height={280}
+                                data={widget.data}
+                            >
+                                <CartesianGrid
+                                    strokeDasharray="3 3"
+                                    stroke="#2d2d35"
+                                />
+                                <XAxis
+                                    type="number"
+                                    dataKey="x"
+                                    domain={["dataMin", "dataMax"]}
+                                    stroke="#6c71c4"
+                                    tick={{ fill: "#6c71c4", fontSize: 12 }}
+                                    tickFormatter={(tick) => tick.toFixed(2)}
+                                />
+                                <YAxis
+                                    type="number"
+                                    domain={["auto", "auto"]}
+                                    stroke="#6c71c4"
+                                    tick={{ fill: "#6c71c4", fontSize: 12 }}
+                                />
+                                <Tooltip
+                                    contentStyle={{
+                                        backgroundColor: "#1a1a1e",
+                                        borderColor: "#2d2d35",
+                                        color: "#f8fafc",
+                                    }}
+                                    itemStyle={{ color: "#8b5cf6" }}
+                                />
+                                <Line
+                                    type="monotone"
+                                    dataKey="y"
+                                    stroke="#8b5cf6"
+                                    strokeWidth={2}
+                                    dot={false}
+                                    isAnimationActive={false}
+                                />
+                            </LineChart>
+                        </div>
+                    </div>
                 )}
             </div>
         </div>

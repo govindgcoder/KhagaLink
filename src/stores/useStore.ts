@@ -3,7 +3,6 @@ import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { persist } from "zustand/middleware";
 import { createJSONStorage } from "zustand/middleware";
-import Telemetry from "../components/telemetry";
 
 type view = "Home" | "Project";
 
@@ -361,7 +360,7 @@ export const useProjectStore = create<ProjectState>()(
                             set((state) => {
                                 //for new array
                                 const updatedGraphs = state.telemetryGraphs.map(
-                                    (graph) => {
+                                    (graph: GraphWidget) => {
                                         const currentX =
                                             parsedValues[graph.x_col_idx] || 0;
                                         const currentY =
@@ -386,10 +385,13 @@ export const useProjectStore = create<ProjectState>()(
                 } catch (err) {
                     console.error("Hardware Connection Failed:", err);
                     alert(`Hardware Error: ${err}`);
-                    telemetryGraphs: state.telemetryGraphs.map((g) => ({
-                        ...g,
-                        data: [],
-                    }));
+                    const state = get(); 
+                    set({
+                        telemetryGraphs: state.telemetryGraphs.map((g) => ({
+                            ...g,
+                            data: [],
+                        })),
+                    });
                 }
             },
         }),

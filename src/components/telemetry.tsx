@@ -25,8 +25,6 @@ export default function Telemetry() {
 
     const addGraphWidget = useProjectStore((state) => state.addTelemetryGraph);
 
-    const metadata = useProjectStore((state) => state.currentCSVmetadata);
-
     const graphListEndRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
