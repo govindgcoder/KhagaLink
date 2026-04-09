@@ -1,5 +1,7 @@
 //#TODO Work on scrollable graph widget after a certain point is reached.
 import { useProjectStore, GraphWidget } from "../stores/useStore";
+import React from "react";
+
 import {
     LineChart,
     Line,
@@ -17,7 +19,7 @@ interface GraphWidgetProps {
     context: string;
 }
 
-export default function GraphWidgetComponent({
+function GraphWidgetComponent({
     widget,
     headers,
     currentCsvPath,
@@ -166,3 +168,5 @@ export default function GraphWidgetComponent({
         </div>
     );
 }
+
+export default React.memo(GraphWidgetComponent);
