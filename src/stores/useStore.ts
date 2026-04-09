@@ -328,12 +328,7 @@ export const useProjectStore = create<ProjectState>()(
       },
       
       setMapConfig: (mapCfg: Partial<MapConfig>) => {
-        set((state) => ({
-          telemetryMapConfig: {
-            ...state.telemetryMapConfig,
-            ...mapCfg,
-          },
-        }));
+        set({ telemetryMapConfig: { ...get().telemetryMapConfig, ...mapCfg } });
       },
 
       connectToHardware: async (port: string, baud: number) => {
