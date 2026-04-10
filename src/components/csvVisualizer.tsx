@@ -163,7 +163,7 @@ export default function CsvVisualizer() {
             </button>
             <button
               onClick={handleNext}
-              disabled={metadata && offset + PAGE_SIZE >= metadata.total_rows}
+              disabled={!!(metadata && offset + PAGE_SIZE >= metadata.total_rows)}
               className={`bg-indigo-600 text-white px-4 py-1 rounded transition-colors ${metadata && offset + PAGE_SIZE >= metadata.total_rows ? "opacity-50 cursor-not-allowed" : "hover:bg-indigo-500"}`}
             >
               Next

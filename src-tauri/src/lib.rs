@@ -59,7 +59,7 @@ pub struct CSVmetadata {
 
 //reads files, get the headers, count rows
 fn read_metadata(path:&str)->Result<CSVmetadata, Box<dyn Error>>{
-    let mut rdr = csv::Reader::from_path(path)?;
+    let mut rdr = csv::ReaderBuilder::new().flexible(true).from_path(path)?;
 
     let headers: Vec<String> = rdr.headers()?.iter().map(|h| h.to_string()).collect();
 
@@ -81,7 +81,10 @@ struct GraphPoint {
 
 #[tauri::command]
 fn get_graph_data(path: String, x_col: usize, y_col: usize, max_points: usize) -> Result<Vec<GraphPoint>, String> {
-    let mut rdr = csv::Reader::from_path(&path).map_err(|e| e.to_string())?;
+    let mut rdr = csv::ReaderBuilder::new()
+        .flexible(true)
+        .from_path(&path)
+        .map_err(|e| e.to_string())?;
 
     // !!! need to be optimized later
     let records: Vec<csv::StringRecord> = rdr.records().collect::<Result<_, _>>().map_err(|e| e.to_string())?;
@@ -121,7 +124,7 @@ fn get_csv_metadata(path:String)->Result<CSVmetadata, String>{
 
 // to get a window of csv rows
 fn read_csv_rows(path:&str, start_index:usize, window_size:usize)->Result<Vec<Vec<String>>, String>{
-	let mut rdr = csv::Reader::from_path(path).map_err(|e| e.to_string())?;
+    let mut rdr = csv::ReaderBuilder::new().flexible(true).from_path(path).map_err(|e| e.to_string())?;
 	let mut rows: Vec<Vec<String>> = Vec::new();
 
 	let chunk = rdr.records().skip(start_index).take(window_size);

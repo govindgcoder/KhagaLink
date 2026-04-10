@@ -44,3 +44,7 @@ body,
 fieldset {
 	font-weight: bolder;
 }
+
+select {
+    background-color: var(--secondary-color);
+}

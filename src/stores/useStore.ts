@@ -40,7 +40,10 @@ interface MapConfig {
 }
 
 interface QuaternionConfig {
-  wCol: number; xCol: number; yCol: number; zCol: number;
+  wCol: number;
+  xCol: number;
+  yCol: number;
+  zCol: number;
   enabled: boolean;
 }
 
@@ -78,21 +81,20 @@ interface ProjectState {
   ) => Promise<void>;
   connectToHardware: (port: string, baud: number) => Promise<void>;
   telemetryHeaders: string[];
-  
+
   telemetryMapConfig: MapConfig;
   setMapConfig: (config: Partial<MapConfig>) => void;
   latestPosition: { lat: number; lng: number } | null;
-  
+
   telemetryQuatConfig: QuaternionConfig;
   setQuatConfig: (config: Partial<QuaternionConfig>) => void;
   latestQuaternion: { w: number; x: number; y: number; z: number };
-  
+
   packetTimestamps: number[];
   packetSequenceNumbers: number[];
   dataRate: number;
   lossRate: number;
   lastSeq: number;
-  
 }
 
 interface CSVmetadata {
@@ -157,12 +159,18 @@ export const useProjectStore = create<ProjectState>()(
       currentCSVmetadata: null,
 
       telemetryHeaders: [],
-      telemetryMapConfig: {latCol: 0, longCol: 0, enabled: false},
+      telemetryMapConfig: { latCol: 0, longCol: 0, enabled: false },
       latestPosition: null,
-      
-      telemetryQuatConfig: {wCol: 0, xCol: 0, yCol: 0, zCol: 0, enabled: false},
-      latestQuaternion: {w: 1, x: 0, y: 0, z: 0},
-      
+
+      telemetryQuatConfig: {
+        wCol: 0,
+        xCol: 0,
+        yCol: 0,
+        zCol: 0,
+        enabled: false,
+      },
+      latestQuaternion: { w: 1, x: 0, y: 0, z: 0 },
+
       packetTimestamps: [],
       packetSequenceNumbers: [],
       dataRate: 0,
@@ -322,18 +330,35 @@ export const useProjectStore = create<ProjectState>()(
       },
 
       updateGraphData: async (id, xCol, yCol, path, context) => {
-        const key = context === "csv" ? "csvGraphs" : "telemetryGraphs";
+        console.log(
+          `[DEBUG - STORE] updateGraphData Called -> id: ${id}, xCol: ${xCol}, yCol: ${yCol}, context: ${context}, path: ${path}`,
+        );
 
-        // Optimistically update dropdowns
-        set({
-          [key]: get()[key].map((g) =>
-            g.id === id ? { ...g, x_col_idx: xCol, y_col_idx: yCol } : g,
-          ),
-        });
+        if (context === "csv") {
+          set({
+            csvGraphs: get().csvGraphs.map((g) =>
+              g.id === id ? { ...g, x_col_idx: xCol, y_col_idx: yCol } : g,
+            ),
+          });
+        } else {
+          set({
+            telemetryGraphs: get().telemetryGraphs.map((g) =>
+              g.id === id ? { ...g, x_col_idx: xCol, y_col_idx: yCol } : g,
+            ),
+          });
+        }
 
-        if (!path || path === "LIVE") return;
+        if (!path || path === "LIVE") {
+          console.log(
+            `[DEBUG - STORE] Aborting Rust fetch. Path is either empty or LIVE.`,
+          );
+          return;
+        }
 
         try {
+          console.log(
+            `[DEBUG - STORE] Invoking Rust 'get_graph_data' with path: ${path}`,
+          );
           const data = await invoke<{ x: number; y: number }[]>(
             "get_graph_data",
             {
@@ -343,20 +368,41 @@ export const useProjectStore = create<ProjectState>()(
               maxPoints: 2000,
             },
           );
-          set({
-            [key]: get()[key].map((g) => (g.id === id ? { ...g, data } : g)),
-          });
+
+          console.log(
+            `[DEBUG - STORE] Rust returned successfully! Data length: ${data.length}`,
+          );
+          if (data.length > 0) {
+            console.log(`[DEBUG - STORE] First point preview:`, data[0]);
+          }
+
+          if (context === "csv") {
+            set({
+              csvGraphs: get().csvGraphs.map((g) =>
+                g.id === id ? { ...g, data } : g,
+              ),
+            });
+          } else {
+            set({
+              telemetryGraphs: get().telemetryGraphs.map((g) =>
+                g.id === id ? { ...g, data } : g,
+              ),
+            });
+          }
+          console.log(`[DEBUG - STORE] Zustand state updated with new data.`);
         } catch (e) {
-          console.error("Graph error:", e);
+          console.error("[DEBUG - STORE] CRITICAL ERROR from Rust:", e);
         }
       },
-      
+
       setMapConfig: (mapCfg: Partial<MapConfig>) => {
         set({ telemetryMapConfig: { ...get().telemetryMapConfig, ...mapCfg } });
       },
-      
+
       setQuatConfig: (quatCfg: Partial<QuaternionConfig>) => {
-        set({ telemetryQuatConfig: { ...get().telemetryQuatConfig, ...quatCfg } });
+        set({
+          telemetryQuatConfig: { ...get().telemetryQuatConfig, ...quatCfg },
+        });
       },
 
       connectToHardware: async (port: string, baud: number) => {
@@ -385,14 +431,14 @@ export const useProjectStore = create<ProjectState>()(
             (event) => {
               const now = Date.now();
               const WINDOW_MS = 5000;
-              
+
               const stringVals = event.payload.split(",");
               const parsedValues = stringVals.map((num) =>
                 parseFloat(num.trim()),
               );
-              
+
               const mapCfg = get().telemetryMapConfig;
-              
+
               if (mapCfg.enabled) {
                 const lat = parsedValues[mapCfg.latCol];
                 const lng = parsedValues[mapCfg.longCol];
@@ -400,39 +446,43 @@ export const useProjectStore = create<ProjectState>()(
                   set({ latestPosition: { lat, lng } });
                 }
               }
-              
+
               const quatCfg = get().telemetryQuatConfig;
-if (quatCfg.enabled) {
+              if (quatCfg.enabled) {
                 set({
                   latestQuaternion: {
                     w: parsedValues[quatCfg.wCol] ?? 1,
                     x: parsedValues[quatCfg.xCol] ?? 0,
                     y: parsedValues[quatCfg.yCol] ?? 0,
                     z: parsedValues[quatCfg.zCol] ?? 0,
-                  }
+                  },
                 });
               }
-              
+
               const seq = parsedValues[0];
-              const expectedSeq = get().lastSeq + 1;
-              const lost = !isNaN(seq) ? seq - expectedSeq : 0;
-              
+
               set((state) => {
-                const timestamps = [...state.packetTimestamps, now]
-                  .filter(t => now - t < WINDOW_MS);
+                const timestamps = [...state.packetTimestamps, now].filter(
+                  (t) => now - t < WINDOW_MS,
+                );
                 const dataRate = (timestamps.length / WINDOW_MS) * 1000;
-                
+
                 const seqNums = [...state.packetSequenceNumbers];
                 if (!isNaN(seq)) {
                   seqNums.push(seq);
                 }
                 const lastFewSeqs = seqNums.slice(-100);
-                const totalExpected = lastFewSeqs.length > 0 
-                  ? (lastFewSeqs[lastFewSeqs.length - 1] - lastFewSeqs[0] + 1)
-                  : 1;
-                const lostCount = Math.max(0, totalExpected - lastFewSeqs.length);
-                const lossRate = totalExpected > 0 ? (lostCount / totalExpected) * 100 : 0;
-                
+                const totalExpected =
+                  lastFewSeqs.length > 0
+                    ? lastFewSeqs[lastFewSeqs.length - 1] - lastFewSeqs[0] + 1
+                    : 1;
+                const lostCount = Math.max(
+                  0,
+                  totalExpected - lastFewSeqs.length,
+                );
+                const lossRate =
+                  totalExpected > 0 ? (lostCount / totalExpected) * 100 : 0;
+
                 return {
                   packetTimestamps: timestamps,
                   packetSequenceNumbers: seqNums.slice(-100),
@@ -441,8 +491,8 @@ if (quatCfg.enabled) {
                   lastSeq: !isNaN(seq) ? seq : state.lastSeq,
                 };
               });
-               
-              const MAX_POINTS = 1000;
+
+              const MAX_POINTS = 5000;
 
               if (get().telemetryHeaders.length === 0) {
                 const inferredHeaders = parsedValues.map(

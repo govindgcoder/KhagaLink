@@ -25,12 +25,7 @@ interface MapWidgetProps {
   ) => void;
 }
 
-export function MapWidget({
-  latCol,
-  longCol,
-  headers,
-  onConfigChange,
-}: MapWidgetProps) {
+export function MapWidget({ headers, onConfigChange }: MapWidgetProps) {
   const position = useProjectStore((s) => s.latestPosition);
 
   return (
