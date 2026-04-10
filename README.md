@@ -1,92 +1,177 @@
+
+<div align="center">
+
 # 🚀💻 KhagaLink
 
-![Version](https://img.shields.io/badge/version-0.5.0-violet) ![Stack](https://img.shields.io/badge/tech-React_|_Tauri_|_Rust-red) ![License](https://img.shields.io/badge/license-MIT-green)
+![Version](https://img.shields.io/badge/version-1.0.0-violet) 
+![Stack](https://img.shields.io/badge/tech-React_|_Tauri_|_Rust-red) 
+![License](https://img.shields.io/badge/license-MIT-green)
+<a href="https://github.com/govindgcoder/KhagaLink/stargazers"><img src="https://img.shields.io/github/stars/govindgcoder/KhagaLink?style=social" alt="Stars" /></a>
 
-> **Mission Control & Telemetry Dashboard for Model Rocketry.**
+<br/>
 
-**(In Active Development)**
+<img width="800" alt="KhagaLink Main Interface" src="https://github.com/user-attachments/assets/a318b053-edc1-434c-b1c4-ee805092676f" />
 
-## 📖 About
+<br/>
 
-**KhagaLink** is a high-performance desktop Ground Control Station (GCS) designed for model rocketry missions. Built with **Tauri (Rust)** and **React**, it serves as the central hub for mission configuration, post-flight analysis, and real-time telemetry monitoring.
+**Rust-powered desktop telemetry dashboard for model rocketry missions.**
 
-A project for my model rocketry club: [_VeloCET_](http://velo.cet.ac.in)
+KhagaLink is a Ground Control Station (GCS) bridging raw flight logs and actionable insights. It combines a React frontend for visualization with a native Rust backend for low-latency serial communication, built specifically for ESP32 and STM32 flight computers.
 
-KhagaLink bridges the gap between raw flight logs and actionable insights. Unlike web-based tools, it leverages a native Rust backend for low-latency serial communication and data processing, ensuring reliability during field operations.
+<br/>
 
-## ✨ Key Features (Targeting v0.1 - v0.2)
+> ### ❤️ Show Your Support
+> *Maintained by a solo developer. If this tool saves you an hour of wrestling with Python scripts or stops your laptop from crashing over a massive CSV, consider dropping a ⭐ on the repo! It is the absolute best way to keep this project alive and updated.*
 
-- **📂 Mission Management:** Organize flight data by specific launches/projects with metadata.
-- **📊 CSV Ingestion Engine:** Rapid parsing of high-frequency sensor logs (accelerometer, gyroscope, barometer) using Rust's `csv` crate.
-- **📈 High-Performance Visualization:** Responsive line graphs for analyzing altitude, velocity, and acceleration data.
-- **🎨 Field-Ready UI:** A clean, high-contrast interface designed for visibility on laptops during outdoor launches.
+</div>
 
-## 🛠 Tech Stack
+***
 
-- **Frontend:** React (TypeScript), CSS
-- **Backend / Native:** Tauri (Rust)
-- **Data Visualization:** Recharts
-- **State Management:** Zustand
-- **Hardware Interface:** Rust `serialport` (Planned)
+### 📸 Screenshots
+<div align="center">
+  <img width="800" alt="KhagaLink View 1" src="https://github.com/user-attachments/assets/221d7a4d-1869-48ea-aa27-be49e08b7872" />
+  <br/><br/>
+  <img width="800" alt="KhagaLink View 2" src="https://github.com/user-attachments/assets/c9f3af4f-735f-4ad3-b53e-fcc7a9b2d14f" />
+  <br/><br/>
+  <img width="800" alt="KhagaLink View 3" src="https://github.com/user-attachments/assets/695f4855-fe24-41f0-8e4e-9cd5ec27ed65" />
+</div>
 
-## 🗺 Development Roadmap
+***
 
-I am currently finalizing **v0.1**. The roadmap prioritizes core data functionality before real-time operations.
+### 🎯 Why a native desktop app?
+* Web-based tools lack reliable, low-level serial port access.
+* Native Rust backends ensure zero-latency data processing during live field operations.
+* Offline-first architecture guarantees functionality on launch days without internet access.
 
-### Phase 1: The Core (Data Analysis)
+***
 
-- [x] **v0.1 (The Archive):** Mission creation system, flight log (CSV) upload & parsing, JSON-based local storage.
-- [x] **v0.2 (The Visuals):** Interactive line graphs for post-flight analysis. Plotting altitude, velocity, and sensor data from uploaded CSVs.
+### ✨ Features (v1.0.0)
 
-### Phase 2: The Live Link (Real-Time)
+**Project Management**
+* Create new projects with custom naming and local folder storage.
+* Load existing projects via native OS file dialogs.
+* Delete projects via right-click context menus.
+* Persistent storage utilizing `localStorage` for UI state and `project.json` for metadata.
 
-- [x] **v0.5 (Telemetry):** Native integration with **Rust Serialport**. Reading real-time data streams from flight computers (ESP32/STM32).
-- [ ] **v0.6 (Live Monitor):** Real-time graphing dashboard with packet loss handling and signal strength monitoring.
+**Real-Time Telemetry**
+* Direct COM port serial connection (e.g., COM5).
+* Configurable baud rates: 9600, 19200, 38400, 57600, 115200, 230400.
+* Live streaming of newline-delimited packets.
+* Native comma-separated value (CSV) packet parsing.
 
-### Phase 3: The Command (GCS)
+**Telemetry Dashboard Widgets**
+* **Live Graphs:** Real-time line charts with configurable data columns and smart auto-panning.
+* **GPS Map:** Leaflet integration displaying lat/lng position based on selected packet indices.
+* **3D Orientation:** Three.js quaternion visualization mapping W/X/Y/Z columns to a 3D model.
+* **Data Rate:** Real-time metrics for packets per second (Hz) and packet loss percentage.
 
-- [ ] **v1.0 (Mission Control):** GPS integration using Leaflet maps to track rocket recovery location. Complete "Ground Control Station" suite.
+**CSV Analysis**
+* Native dialog browser for CSV file selection.
+* Paginated table view (50 rows/page) with automatic header detection.
+* Column intelligence displaying total rows and column counts.
+* Interactive line graphs supporting any X/Y column combination.
+* Smart data downsampling (max 2000 points) to maintain render performance.
 
-## 🚀 Getting Started
+***
 
-### Prerequisites
+### 🛠️ Tech Stack
 
-Ensure you have the following installed:
+| Layer | Technology |
+| :--- | :--- |
+| **Frontend** | React 19, TypeScript |
+| **Desktop Core** | Tauri 2 (Rust) |
+| **State Management** | Zustand 5 (with persistence) |
+| **Build Tool** | Vite 7 |
+| **Styling** | Tailwind CSS 4 |
+| **Charts** | Recharts |
+| **Maps** | Leaflet + react-leaflet |
+| **3D Rendering** | Three.js + @react-three/fiber |
+| **Hardware IO** | Rust `serialport` crate |
+| **Data Parsing** | Rust `csv` crate |
 
-- [Node.js](https://nodejs.org/) (LTS)
-- [Rust & Cargo](https://www.rust-lang.org/tools/install) (Required for the Tauri backend)
+***
 
-### Installation
+### 🏗️ Architecture
 
-1.  **Clone the repository**
+**Frontend (React)**
+Handles all UI components, 3D rendering, and chart updates. Communicates with Tauri via `invoke()` commands and listens to `telemetry-packet` events.
 
-    ```bash
-    git clone [https://github.com/govindgcoder/KhagaLink.git](https://github.com/govindgcoder/KhagaLink.git)
-    cd khagalink
-    ```
+**Tauri Core (Rust)**
+Manages file operations (`create_project`, `load_project`, `save_project`), heavy data parsing (`get_csv_metadata`, `get_graph_data`), and spawns dedicated background threads for uninterrupted serial port listening.
 
-2.  **Install frontend dependencies**
+***
 
-    ```bash
-    npm install
-    ```
+### 🚀 Getting Started
 
-3.  **Run in Development Mode**
-    ```bash
-    npm run tauri dev
-    ```
+**Prerequisites**
+* Node.js (LTS)
+* Rust & Cargo
 
-## 🏗 Architecture
+**Installation**
+```bash
+# Clone the repository
+git clone [https://github.com/govindgcoder/KhagaLink.git](https://github.com/govindgcoder/KhagaLink.git)
+cd KhagaLink
 
-- **Frontend (React):** Handles the Mission Control UI and renders charts using `Recharts`.
-- **Tauri Core (Rust):**
-    - Manages file system access for secure CSV reading/writing.
-    - **(Upcoming):** Handles the `serialport` thread to ingest USB telemetry data without blocking the UI.
+# Install dependencies
+npm install
 
-## 🤝 Development
+# Run development server
+npm run tauri dev
+```
 
-This project is developed primarily for the **VeloCET Payload Team**. Suggestions and PRs are welcome!
+**Build for Production**
+```bash
+npm run tauri build
+```
+*Output binaries (.exe for Windows, .app for macOS) will be generated in `src-tauri/target/release/`.*
 
-## 📄 License
+***
 
-Distributed under the MIT License. See `LICENSE` for more information.
+### 📖 Usage Guide
+
+1. **Create a Project:** Click "Create a new Project", select a local folder, and assign a name.
+2. **Load Flight Data (CSV):** Open your project, click the "+" icon to browse, and select your flight log.
+3. **Analyze Data:** Use the paginated table to inspect raw values. Add Graph Widgets and select your X/Y columns to visualize trends.
+4. **Connect to Flight Hardware:** Navigate to the Telemetry tab, click "Configure Connection", enter your COM port and Baud Rate, and connect.
+5. **Monitor Live Data:** Add live graphs, map your GPS columns, and assign quaternion data to watch the 3D orientation model track your hardware in real time.
+
+***
+
+### 📁 File Structure
+
+```text
+KhagaLink/
+├── src/
+│   ├── components/
+│   │   ├── home.tsx                 # Project list & creation
+│   │   ├── projectDashboard.tsx     # Main dashboard shell
+│   │   ├── csvVisualizer.tsx        # CSV table + static graphs
+│   │   ├── telemetry.tsx            # Live telemetry dashboard
+│   │   ├── GraphWidgetComponent.tsx # Shared charting logic
+│   │   ├── mapView.tsx              # Leaflet GPS integration
+│   │   ├── orientationWidget.tsx    # Three.js quaternion viz
+│   │   ├── DataRateWidget.tsx       # Link statistics
+│   │   ├── projectCreator.tsx
+│   │   └── projectLoader.tsx
+│   ├── stores/
+│   │   └── useStore.ts              # Zustand state & Rust bridge
+│   ├── App.tsx
+│   ├── main.tsx
+│   └── index.css
+├── src-tauri/
+│   ├── src/
+│   │   ├── lib.rs                   # Tauri commands & Serial threads
+│   │   └── main.rs
+│   ├── Cargo.toml
+│   └── tauri.conf.json
+├── package.json
+└── vite.config.ts
+```
+
+***
+
+### 📜 License & Credits
+MIT License. 
+
+Built for the **VeloCET Payload Team** at [velo.cet.ac.in](http://velo.cet.ac.in).
