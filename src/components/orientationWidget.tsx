@@ -43,7 +43,7 @@ function Cylinder({ quaternion }: CylinderProps) {
 
   return (
     <mesh ref={meshRef}>
-      <cylinderGeometry args={[0.5, 0.5, 2, 32]} />
+      <cylinderGeometry args={[0.75, 0.75, 5, 16]} />
       <meshStandardMaterial color="#8b5cf6" />
     </mesh>
   );
@@ -59,19 +59,10 @@ export function OrientationWidget({
 }: OrientationWidgetProps) {
   const quat = useProjectStore((s) => s.latestQuaternion);
   const quatConfig = useProjectStore((s) => s.telemetryQuatConfig);
-
+  quatConfig.enabled = true;
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex flex-wrap gap-2 items-center">
-        <label className="flex items-center gap-1">
-          <input
-            type="checkbox"
-            checked={quatConfig.enabled}
-            onChange={(e) => onConfigChange({ enabled: e.target.checked })}
-          />
-          Enabled
-        </label>
-
+    <div className="flex flex-col gap-2 my-4">
+      <div className="flex flex-wrap gap-2 items-center text-xs bg-gray-600 justify-evenly">
         <select
           value={wCol}
           onChange={(e) => onConfigChange({ wCol: +e.target.value })}

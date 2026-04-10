@@ -3,6 +3,7 @@ import { useProjectStore } from "../stores/useStore";
 import GraphWidgetComponent from "./GraphWidgetComponent";
 import { MapWidget } from "./mapView";
 import { OrientationWidget } from "./orientationWidget";
+import { DataRateWidget } from "./DataRateWidget";
 
 export default function Telemetry() {
   const [port, setPort] = useState("");
@@ -37,9 +38,9 @@ export default function Telemetry() {
     (state) => state.telemetryMapConfig,
   );
   const setMapConfig = useProjectStore((state) => state.setMapConfig);
-  
-  const telemetryQuatConfig = useProjectStore(s => s.telemetryQuatConfig);
-  const setQuatConfig = useProjectStore(s => s.setQuatConfig);
+
+  const telemetryQuatConfig = useProjectStore((s) => s.telemetryQuatConfig);
+  const setQuatConfig = useProjectStore((s) => s.setQuatConfig);
 
   return (
     <div className="p-8 flex flex-col gap-4 h-full bg-[var(--background-color)] rounded-xl">
@@ -92,8 +93,10 @@ export default function Telemetry() {
         </div>
       </dialog>
 
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Telemetry Dashboard</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold mb-4 text-slate-50">
+          Telemetry Dashboard
+        </h2>
         <button
           onClick={openModal}
           className={`px-6 py-2 rounded-lg font-medium transition ${port ? "bg-green-600" : "bg-blue-600 hover:bg-blue-500"}`}
@@ -107,7 +110,7 @@ export default function Telemetry() {
           <div className="flex justify-between items-center mb-4 shrink-0">
             <button
               onClick={addGraphWidget}
-              className="bg-violet-600 hover:bg-violet-500 text-white px-4 py-2 rounded font-bold transition-all shadow-md"
+              className="text-[14px] bg-indigo-600 hover:bg-violet-500 text-gray-100 px-4 rounded font-bold transition-all shadow-md"
             >
               + Add Graph
             </button>
@@ -140,7 +143,16 @@ export default function Telemetry() {
             <div ref={graphListEndRef} className="h-1 shrink-0" />
           </div>
         </div>
-        <div className="flex flex-col flex-2 h-full p-4 border border-slate-900 rounded">
+        <div className="flex flex-col flex-2 h-full p-4 border border-slate-900 rounded overflow-auto">
+          
+          <div className="flex justify-between items-center mb-4 shrink-0">
+            <div
+              className="text-[14px] text-gray-100"
+            >
+              Position and Orientation
+            </div>
+          </div>
+          
           <MapWidget
             latCol={telemetryMapConfig.latCol}
             longCol={telemetryMapConfig.longCol}
@@ -153,7 +165,7 @@ export default function Telemetry() {
               setMapConfig({ ...config, enabled: true });
             }}
           />
-        
+
           <OrientationWidget
             wCol={telemetryQuatConfig.wCol}
             xCol={telemetryQuatConfig.xCol}
@@ -168,6 +180,7 @@ export default function Telemetry() {
               setQuatConfig({ ...config, enabled: true });
             }}
           />
+          <DataRateWidget />
         </div>
       </div>
     </div>

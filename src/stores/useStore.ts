@@ -87,6 +87,12 @@ interface ProjectState {
   setQuatConfig: (config: Partial<QuaternionConfig>) => void;
   latestQuaternion: { w: number; x: number; y: number; z: number };
   
+  packetTimestamps: number[];
+  packetSequenceNumbers: number[];
+  dataRate: number;
+  lossRate: number;
+  lastSeq: number;
+  
 }
 
 interface CSVmetadata {
@@ -156,6 +162,12 @@ export const useProjectStore = create<ProjectState>()(
       
       telemetryQuatConfig: {wCol: 0, xCol: 0, yCol: 0, zCol: 0, enabled: false},
       latestQuaternion: {w: 1, x: 0, y: 0, z: 0},
+      
+      packetTimestamps: [],
+      packetSequenceNumbers: [],
+      dataRate: 0,
+      lossRate: 0,
+      lastSeq: -1,
 
       createProject: async (path: string, name: string) => {
         try {
@@ -371,6 +383,9 @@ export const useProjectStore = create<ProjectState>()(
           unlistenTelemetry = await listen<string>(
             "telemetry-packet",
             (event) => {
+              const now = Date.now();
+              const WINDOW_MS = 5000;
+              
               const stringVals = event.payload.split(",");
               const parsedValues = stringVals.map((num) =>
                 parseFloat(num.trim()),
@@ -387,7 +402,7 @@ export const useProjectStore = create<ProjectState>()(
               }
               
               const quatCfg = get().telemetryQuatConfig;
-              if (quatCfg.enabled) {
+if (quatCfg.enabled) {
                 set({
                   latestQuaternion: {
                     w: parsedValues[quatCfg.wCol] ?? 1,
@@ -398,6 +413,35 @@ export const useProjectStore = create<ProjectState>()(
                 });
               }
               
+              const seq = parsedValues[0];
+              const expectedSeq = get().lastSeq + 1;
+              const lost = !isNaN(seq) ? seq - expectedSeq : 0;
+              
+              set((state) => {
+                const timestamps = [...state.packetTimestamps, now]
+                  .filter(t => now - t < WINDOW_MS);
+                const dataRate = (timestamps.length / WINDOW_MS) * 1000;
+                
+                const seqNums = [...state.packetSequenceNumbers];
+                if (!isNaN(seq)) {
+                  seqNums.push(seq);
+                }
+                const lastFewSeqs = seqNums.slice(-100);
+                const totalExpected = lastFewSeqs.length > 0 
+                  ? (lastFewSeqs[lastFewSeqs.length - 1] - lastFewSeqs[0] + 1)
+                  : 1;
+                const lostCount = Math.max(0, totalExpected - lastFewSeqs.length);
+                const lossRate = totalExpected > 0 ? (lostCount / totalExpected) * 100 : 0;
+                
+                return {
+                  packetTimestamps: timestamps,
+                  packetSequenceNumbers: seqNums.slice(-100),
+                  dataRate,
+                  lossRate,
+                  lastSeq: !isNaN(seq) ? seq : state.lastSeq,
+                };
+              });
+               
               const MAX_POINTS = 1000;
 
               if (get().telemetryHeaders.length === 0) {

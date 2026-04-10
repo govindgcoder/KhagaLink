@@ -71,7 +71,7 @@ export default function ProjectDashboard() {
                                     type="button"
                                     className="
                                     bg-[var(--background-color)]
-                             w-full text-xl rounded py-2 hover:bg-white/5 transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-white/20"
+                             w-full text-2xs rounded py-2 hover:bg-white/5 transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-white/20"
                                     onClick={() => setSelectedTab("csv")}
                                 >
                                     csv
@@ -80,7 +80,7 @@ export default function ProjectDashboard() {
                                     type="button"
                                     className={`
                                     bg-[var(--background-color)]
-                         w-full text-xl rounded py-2 hover:bg-white/5 transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-white/20`}
+                         w-full text-2xs rounded py-2 hover:bg-white/5 transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-white/20`}
                                     onClick={() => setSelectedTab("tele")}
                                 >
                                     tele
