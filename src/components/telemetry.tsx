@@ -46,7 +46,7 @@ export default function Telemetry() {
     <div className="p-8 flex flex-col gap-4 h-full bg-[var(--background-color)] rounded-xl">
       <dialog
         ref={dialogRef}
-        className="p-0 rounded-xl overflow-hidden bg-slate-700 text-white shadow-2xl backdrop:bg-black/60 place-self-center"
+        className="p-0 rounded-xl overflow-hidden bg-slate-700 text-white shadow-2xl backdrop:bg-black/60 backdrop-blur-sm place-self-center"
       >
         <div className="p-6 flex flex-col gap-4 min-w-[300px]">
           <h2 className="text-xl font-bold border-b border-slate-700 pb-2">
@@ -54,10 +54,10 @@ export default function Telemetry() {
           </h2>
 
           <div className="flex flex-col gap-1">
-            <label className="text-sm text-slate-400">Port</label>
+            <label className="text-sm text-slate-300">Port</label>
             <input
               type="text"
-              className="bg-slate-700 p-2 rounded border border-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="bg-slate-700 p-2 rounded border border-slate-600 focus:outline-none focus:ring-2 focus:ring-violet-500"
               value={port}
               onChange={(e) => setPort(e.target.value)}
               placeholder="e.g. COM5"
@@ -65,26 +65,32 @@ export default function Telemetry() {
           </div>
 
           <div className="flex flex-col gap-1">
-            <label className="text-sm text-slate-400">Baud Rate</label>
-            <input
-              type="text"
-              className="bg-slate-700 p-2 rounded border border-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            <label className="text-sm text-slate-300">Baud Rate</label>
+            <select
+              className="bg-slate-700 p-2 rounded border border-slate-600 focus:outline-none focus:ring-2 focus:ring-violet-500"
               value={baudRate}
               onChange={(e) => setBaudRate(+e.target.value)}
-            />
+            >
+              <option value={9600}>9600</option>
+              <option value={19200}>19200</option>
+              <option value={38400}>38400</option>
+              <option value={57600}>57600</option>
+              <option value={115200}>115200</option>
+              <option value={230400}>230400</option>
+            </select>
           </div>
 
           <div className="flex justify-end gap-3 mt-4">
             <button
               type="button"
-              className="px-4 py-2 hover:bg-slate-700 rounded transition"
+              className="px-4 py-2 bg-slate-600 hover:bg-slate-500 rounded transition"
               onClick={closeModal}
             >
               Cancel
             </button>
             <button
               type="button"
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded font-semibold transition"
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded font-semibold transition"
               onClick={handleConnect}
             >
               Connect
@@ -99,9 +105,9 @@ export default function Telemetry() {
         </h2>
         <button
           onClick={openModal}
-          className={`px-6 py-2 rounded-lg font-medium transition ${port ? "bg-green-600" : "bg-blue-600 hover:bg-blue-500"}`}
+          className={`px-6 py-2 rounded-lg text-[14px] font-medium transition ${port ? "bg-green-600" : "bg-indigo-600 hover:bg-indigo-500"}`}
         >
-          {port ? `Connected: ${port}` : "Configure Connection"}
+          {port ? `Connected: ${port} ✓` : "Configure Connection"}
         </button>
       </div>
 
@@ -110,9 +116,9 @@ export default function Telemetry() {
           <div className="flex justify-between items-center mb-4 shrink-0">
             <button
               onClick={addGraphWidget}
-              className="text-[14px] bg-indigo-600 hover:bg-violet-500 text-gray-100 px-4 rounded font-bold transition-all shadow-md"
+              className="text-2xs bg-indigo-500 hover:bg-indigo-300 text-white px-4 rounded transition-all shadow-2xs"
             >
-              + Add Graph
+              +
             </button>
           </div>
           <div
@@ -136,14 +142,17 @@ export default function Telemetry() {
               />
             ))}
             {activeGraphs.length === 0 && (
-              <div className="text-center text-slate-500 mt-10">
-                Click "+ Add Graph" to plot live data.
+              <div className="flex flex-col items-center gap-2 text-slate-400 mt-10">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+                <p>Click '+' to add graphs</p>
               </div>
             )}
             <div ref={graphListEndRef} className="h-1 shrink-0" />
           </div>
         </div>
-        <div className="flex flex-col flex-2 h-full p-4 border border-slate-900 rounded overflow-auto">
+        <div className="flex flex-col flex-2 h-full p-4 border border-slate-800 rounded overflow-auto">
           
           <div className="flex justify-between items-center mb-4 shrink-0">
             <div

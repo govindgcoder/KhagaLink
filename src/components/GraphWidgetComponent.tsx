@@ -62,7 +62,7 @@ function GraphWidgetComponent({
     return (
         <div className="bg-[var(--secondary-color)] border border-slate-800 rounded-lg p-4 flex flex-col gap-4 shadow-lg h-[400px] shrink-0">
             <div className="flex justify-between items-center border-b border-slate-800 pb-2">
-                <div className="flex gap-4 items-center">
+                <div className="flex gap-4 items-center text-xs">
                     <span className="text-emerald-400 font-bold font-mono">
                         X-Axis:
                     </span>
@@ -100,7 +100,7 @@ function GraphWidgetComponent({
 
                 <button
                     onClick={() => removeGraphWidget(widget.id)}
-                    className="text-red-400 hover:bg-red-500/20 px-3 py-1 rounded transition-colors"
+                    className="text-red-400 hover:bg-red-500/20 text-xs px-3 py-1 rounded transition-colors"
                 >
                     Remove
                 </button>

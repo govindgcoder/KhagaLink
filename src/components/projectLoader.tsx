@@ -34,20 +34,20 @@ export default function ProjectLoader() {
 	};
 
 	return (
-		<div className="p-6 border rounded-lg max-w-lg mx-auto">
+		<div className="p-6 border border-slate-600 rounded-lg max-w-lg mx-auto bg-slate-800">
 			<fieldset className="space-y-6">
-				<label className="block mb-2">Path:</label>
+				<label className="block mb-2 text-slate-200">Path:</label>
 				<div className="flex gap-4 items-center">
 					<input
 						type="text"
 						value={path}
 						readOnly
 						placeholder="Select a folder..."
-						className="border border-gray-300 rounded px-2 py-1 flex-grow"
+						className="border border-slate-600 bg-slate-700 text-slate-100 rounded px-2 py-1 flex-grow"
 					/>
 					<button
 						onClick={handleBrowse}
-						className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+						className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-500 transition-colors"
 					>
 						Browse
 					</button>
@@ -55,7 +55,7 @@ export default function ProjectLoader() {
 
 				<button
 					onClick={()=>handleLoadProject}
-					className="mt-6 bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600"
+					className="mt-6 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-500 transition-colors"
 				>
 					Create Project
 				</button>

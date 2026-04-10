@@ -29,19 +29,21 @@ export default function ProjectDashboard() {
         loadView("Home");
     }
 
+    const isTabActive = (tab: string) => selectedTab === tab;
+
     return (
         <div className="size-full">
             <div className="project-dashboard-layout bg-[var(--secondary-color)] p-4 w-screen h-screen flex">
                 <div
                     id="sidebar"
-                    className={`h-full ${isSidebarOpen ? "w-42" : "w-12"} bg-[var(--secondary-color)] transition-all duration-150 ease-in-out mr-3`}
+                    className={`h-full ${isSidebarOpen ? "w-48" : "w-12"} transition-all duration-150 ease-in-out mr-3`}
                 >
                     <div className="flex flex-col justify-between h-full">
                         <div>
                             <div className="flex items-center justify-start py-2">
                                 <button
                                     type="button"
-                                    className="mx-1 p-1 rounded hover:bg-white/10 active:scale-95 transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-white/30"
+                                    className="mx-1 p-1 rounded hover:bg-white/10 active:scale-95 transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-violet-500"
                                     onClick={handleExit}
                                     aria-label="Exit Project"
                                 >
@@ -61,7 +63,7 @@ export default function ProjectDashboard() {
                                             />
                                         </svg>
                                                                     </button>
-                                <p className="text-2xl truncate">
+                                <p className="text-2xl font-semibold truncate text-white">
                                     {currentProject&&isSidebarOpen ? currentProject.name : ""}
                                 </p>
                                
@@ -69,27 +71,27 @@ export default function ProjectDashboard() {
                             <div className="mt-8 flex flex-col gap-3 px-1">
                                 <button
                                     type="button"
-                                    className="
-                                    bg-[var(--background-color)]
-                             w-full text-2xs rounded py-2 hover:bg-white/5 transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-white/20"
+                                    className={`w-full text-2xs rounded py-2 transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-white/20 ${
+                                        isTabActive("csv") ? "bg-indigo-400 text-white" : "bg-[var(--background-color)] hover:bg-white/5"
+                                    }`}
                                     onClick={() => setSelectedTab("csv")}
                                 >
                                     csv
                                 </button>
                                 <button
                                     type="button"
-                                    className={`
-                                    bg-[var(--background-color)]
-                         w-full text-2xs rounded py-2 hover:bg-white/5 transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-white/20`}
+                                    className={`w-full text-2xs rounded py-2 transition-colors duration-150 ease-in-out focus:outline-none focus:ring-2 focus:ring-white/20 ${
+                                        isTabActive("tele") ? "bg-indigo-400 text-white" : "bg-[var(--background-color)] hover:bg-white/5"
+                                    }`}
                                     onClick={() => setSelectedTab("tele")}
                                 >
-                                    tele
+                                    {isSidebarOpen ? "telemetry" : "tele"}
                                 </button>
                             </div>
                             
                         </div>
                         
-                        <div className="w-full h-full" onClick={handleToggleSideBar}>
+                        <div className="w-full h-full cursor-pointer hover:bg-white/5" onClick={handleToggleSideBar}>
                             
                         </div>
                     </div>
