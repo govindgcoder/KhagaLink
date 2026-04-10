@@ -28,8 +28,6 @@ KhagaLink is a Ground Control Station (GCS) bridging raw flight logs and actiona
 
 ### 📸 Screenshots
 <div align="center">
-  <img width="800" alt="KhagaLink View 1" src="https://github.com/user-attachments/assets/221d7a4d-1869-48ea-aa27-be49e08b7872" />
-  <br/><br/>
   <img width="800" alt="KhagaLink View 2" src="https://github.com/user-attachments/assets/c9f3af4f-735f-4ad3-b53e-fcc7a9b2d14f" />
   <br/><br/>
   <img width="800" alt="KhagaLink View 3" src="https://github.com/user-attachments/assets/695f4855-fe24-41f0-8e4e-9cd5ec27ed65" />
