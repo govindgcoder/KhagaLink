@@ -16,13 +16,13 @@ function MapPanner({ position }: { position: [number, number] }) {
 
 interface MapWidgetProps {
   latCol: number;
-  lngCol: number;
+  longCol: number;
   headers: string[];
   onConfigChange: (config: Partial<{ latCol: number; lngCol: number }>) => void;
 }
 
 
-export function MapWidget({ latCol, lngCol, headers, onConfigChange }: MapWidgetProps) {
+export function MapWidget({ latCol, longCol, headers, onConfigChange }: MapWidgetProps) {
   const position = useProjectStore(s => s.latestPosition);
   
   return (
@@ -32,7 +32,7 @@ export function MapWidget({ latCol, lngCol, headers, onConfigChange }: MapWidget
         <select onChange={e => onConfigChange({ latCol: +e.target.value })}>
           {headers.map((h, i) => <option key={i} value={i}>{h}</option>)}
         </select>
-        <select onChange={e => onConfigChange({ lngCol: +e.target.value })}>
+        <select onChange={e => onConfigChange({ longCol: +e.target.value })}>
           {headers.map((h, i) => <option key={i} value={i}>{h}</option>)}
         </select>
       </div>

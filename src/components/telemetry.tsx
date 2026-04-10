@@ -2,11 +2,12 @@ import { useState, useRef, useEffect } from "react";
 import { useProjectStore } from "../stores/useStore";
 import GraphWidgetComponent from "./GraphWidgetComponent";
 import { MapWidget } from "./mapView";
+import { OrientationWidget } from "./orientationWidget";
 
 export default function Telemetry() {
   const [port, setPort] = useState("");
   const [baudRate, setBaudRate] = useState(9600);
-  
+
   const dialogRef = useRef<HTMLDialogElement | null>(null);
 
   const connectToHardware = useProjectStore((state) => state.connectToHardware);
@@ -32,8 +33,13 @@ export default function Telemetry() {
   }, [activeGraphs.length]);
 
   const telemetryHeaders = useProjectStore((state) => state.telemetryHeaders);
-  const telemetryMapConfig = useProjectStore((state) => state.telemetryMapConfig);
+  const telemetryMapConfig = useProjectStore(
+    (state) => state.telemetryMapConfig,
+  );
   const setMapConfig = useProjectStore((state) => state.setMapConfig);
+  
+  const telemetryQuatConfig = useProjectStore(s => s.telemetryQuatConfig);
+  const setQuatConfig = useProjectStore(s => s.setQuatConfig);
 
   return (
     <div className="p-8 flex flex-col gap-4 h-full bg-[var(--background-color)] rounded-xl">
@@ -137,10 +143,29 @@ export default function Telemetry() {
         <div className="flex flex-col flex-2 h-full p-4 border border-slate-900 rounded">
           <MapWidget
             latCol={telemetryMapConfig.latCol}
-            lngCol={telemetryMapConfig.longCol}
-            headers={telemetryHeaders.length > 0 ? telemetryHeaders : ["Field 0", "Field 1"]}
+            longCol={telemetryMapConfig.longCol}
+            headers={
+              telemetryHeaders.length > 0
+                ? telemetryHeaders
+                : ["Field 0", "Field 1"]
+            }
             onConfigChange={(config) => {
               setMapConfig({ ...config, enabled: true });
+            }}
+          />
+        
+          <OrientationWidget
+            wCol={telemetryQuatConfig.wCol}
+            xCol={telemetryQuatConfig.xCol}
+            yCol={telemetryQuatConfig.yCol}
+            zCol={telemetryQuatConfig.zCol}
+            headers={
+              telemetryHeaders.length > 0
+                ? telemetryHeaders
+                : ["Field 0", "Field 1"]
+            }
+            onConfigChange={(config) => {
+              setQuatConfig({ ...config, enabled: true });
             }}
           />
         </div>

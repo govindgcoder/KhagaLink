@@ -39,6 +39,11 @@ interface MapConfig {
   enabled: boolean;
 }
 
+interface QuaternionConfig {
+  wCol: number; xCol: number; yCol: number; zCol: number;
+  enabled: boolean;
+}
+
 interface ProjectState {
   current_view: view | null;
   load_view: (view: view) => void;
@@ -77,6 +82,10 @@ interface ProjectState {
   telemetryMapConfig: MapConfig;
   setMapConfig: (config: Partial<MapConfig>) => void;
   latestPosition: { lat: number; lng: number } | null;
+  
+  telemetryQuatConfig: QuaternionConfig;
+  setQuatConfig: (config: Partial<QuaternionConfig>) => void;
+  latestQuaternion: { w: number; x: number; y: number; z: number };
   
 }
 
@@ -144,6 +153,9 @@ export const useProjectStore = create<ProjectState>()(
       telemetryHeaders: [],
       telemetryMapConfig: {latCol: 0, longCol: 0, enabled: false},
       latestPosition: null,
+      
+      telemetryQuatConfig: {wCol: 0, xCol: 0, yCol: 0, zCol: 0, enabled: false},
+      latestQuaternion: {w: 1, x: 0, y: 0, z: 0},
 
       createProject: async (path: string, name: string) => {
         try {
@@ -330,6 +342,10 @@ export const useProjectStore = create<ProjectState>()(
       setMapConfig: (mapCfg: Partial<MapConfig>) => {
         set({ telemetryMapConfig: { ...get().telemetryMapConfig, ...mapCfg } });
       },
+      
+      setQuatConfig: (quatCfg: Partial<QuaternionConfig>) => {
+        set({ telemetryQuatConfig: { ...get().telemetryQuatConfig, ...quatCfg } });
+      },
 
       connectToHardware: async (port: string, baud: number) => {
         set({
@@ -370,6 +386,17 @@ export const useProjectStore = create<ProjectState>()(
                 }
               }
               
+              const quatCfg = get().telemetryQuatConfig;
+              if (quatCfg.enabled) {
+                set({
+                  latestQuaternion: {
+                    w: parsedValues[quatCfg.wCol] ?? 1,
+                    x: parsedValues[quatCfg.xCol] ?? 0,
+                    y: parsedValues[quatCfg.yCol] ?? 0,
+                    z: parsedValues[quatCfg.zCol] ?? 0,
+                  }
+                });
+              }
               
               const MAX_POINTS = 1000;
 
