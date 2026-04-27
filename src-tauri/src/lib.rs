@@ -29,13 +29,15 @@ pub struct CsvFileConfig {
 
 use std::path::Path;
 use std::fs;
+use chrono::Local;
 
 #[tauri::command]
 fn create_project(path: String, name: String) -> Result<String, String> {
+    let local_date = Local::now().date_naive().format("%d-%m-%Y");
     let new_project = Project {
         name: name.clone(),
         path: path.clone(),
-        created_at: "2025-11-3".to_string(),
+        created_at: local_date.to_string(),
         csv_files: vec![],
     };
     let json_data = serde_json::to_string_pretty(&new_project).map_err(|e| e.to_string())?;
