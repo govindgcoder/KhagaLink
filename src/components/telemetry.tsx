@@ -8,6 +8,7 @@ import { DataRateWidget } from "./DataRateWidget";
 export default function Telemetry() {
   const [port, setPort] = useState("");
   const [baudRate, setBaudRate] = useState(9600);
+  const [isConnected, setIsConnected] = useState(false);
 
   const dialogRef = useRef<HTMLDialogElement | null>(null);
 
@@ -20,6 +21,7 @@ export default function Telemetry() {
 
   const handleConnect = () => {
     connectToHardware(port, baudRate);
+    setIsConnected(true);
     closeModal();
   };
 
@@ -41,6 +43,13 @@ export default function Telemetry() {
 
   const telemetryQuatConfig = useProjectStore((s) => s.telemetryQuatConfig);
   const setQuatConfig = useProjectStore((s) => s.setQuatConfig);
+
+  const disconnectHardware = useProjectStore((state) => state.disconnectHardware);
+  const handleDisconnect = () => {
+    disconnectHardware();
+    setPort(""); // Clear port state
+    setIsConnected(false);
+  };
 
   return (
     <div className="p-8 flex flex-col gap-4 h-full bg-[var(--background-color)] rounded-xl">
@@ -104,8 +113,8 @@ export default function Telemetry() {
           Telemetry Dashboard
         </h2>
         <button
-          onClick={openModal}
-          className={`px-6 py-2 rounded-lg text-[14px] font-medium transition ${port ? "bg-green-600" : "bg-indigo-600 hover:bg-indigo-500"}`}
+          onClick={port ? handleDisconnect : openModal}
+          className={`px-6 py-2 rounded-lg text-[14px] font-medium transition ${port ? "bg-green-600 hover:bg-red-500": "bg-indigo-600 hover:bg-indigo-500"}`}
         >
           {port ? `Connected: ${port} ✓` : "Configure Connection"}
         </button>

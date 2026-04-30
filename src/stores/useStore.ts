@@ -80,6 +80,7 @@ interface ProjectState {
     context: string,
   ) => Promise<void>;
   connectToHardware: (port: string, baud: number) => Promise<void>;
+  disconnectHardware: () => Promise<void>;
   telemetryHeaders: string[];
 
   telemetryMapConfig: MapConfig;
@@ -103,6 +104,7 @@ interface CSVmetadata {
 }
 
 let unlistenTelemetry: (() => void) | null = null;
+let unlistenDisconnect: (() => void) | null = null;
 
 export const useGlobalStore = create<ProjectList>()(
   persist(
@@ -262,8 +264,16 @@ export const useProjectStore = create<ProjectState>()(
         const current_project = get().current_project;
         if (!current_project) return;
 
+        if (!path.endsWith(".csv") && !path.endsWith(".txt")) {
+          alert("Please choose a csv/txt file!");
+          return;
+        }
+
         for (const csvPath of current_project.csv_files) {
-          if (csvPath.path === path) return;
+          if (csvPath.path === path) {
+            alert("This file has already been selected!");
+            return;
+          }
         }
 
         const updated_project = {
@@ -417,6 +427,10 @@ export const useProjectStore = create<ProjectState>()(
           unlistenTelemetry();
           unlistenTelemetry = null;
         }
+        if (unlistenDisconnect) {
+          unlistenDisconnect();
+          unlistenDisconnect = null;
+        }
         try {
           // to start the background thread by Rust
           const response = await invoke("start_telemetry_stream", {
@@ -524,6 +538,10 @@ export const useProjectStore = create<ProjectState>()(
               });
             },
           );
+
+          unlistenDisconnect = await listen("telemetry-disconnected", () => {
+            get().disconnectHardware();
+          });
         } catch (err) {
           console.error("Hardware Connection Failed:", err);
           alert(`Hardware Error: ${err}`);
@@ -535,6 +553,35 @@ export const useProjectStore = create<ProjectState>()(
               data: [],
             })),
           });
+        }
+      },
+      disconnectHardware: async () => {
+        try {
+          await invoke("stop_telemetry_stream");
+
+          if (unlistenTelemetry) {
+            unlistenTelemetry();
+            unlistenTelemetry = null;
+          }
+          set({
+            telemetryHeaders: [],
+            telemetryGraphs: get().telemetryGraphs.map((g) => ({
+              ...g,
+              data: [],
+            })),
+            latestPosition: null,
+            latestQuaternion: { w: 1, x: 0, y: 0, z: 0 },
+            packetTimestamps: [],
+            packetSequenceNumbers: [],
+            dataRate: 0,
+            lossRate: 0,
+            lastSeq: -1,
+          });
+
+          alert("Disconnected successfully.");
+        } catch (err) {
+          console.error("Disconnect failed:", err);
+          alert(`Disconnect Error: ${err}`);
         }
       },
     }),

@@ -233,6 +233,8 @@ fn start_telemetry_stream(
             }
         }
 
+        // Emit disconnect event to frontend
+        let _ = app_handle.emit("telemetry-disconnected", "Stream terminated");
         println!("Telemetry thread shut down gracefully.");
     });
 

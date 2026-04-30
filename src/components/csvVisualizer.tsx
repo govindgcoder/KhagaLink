@@ -32,7 +32,7 @@ export default function CsvVisualizer() {
 
   const handleView = () => {
     if (!path) return;
-    addCsvToList(path);
+    // addCsvToList(path);
     loadCSVmetadata(path);
     loadCSVrows(path, 0, 50);
   };
@@ -62,6 +62,7 @@ export default function CsvVisualizer() {
       });
       if (selected) {
         setPath(selected);
+        addCsvToList(selected);
       }
     } catch (err) {
       console.log("Failed to open dialog: ", err);
@@ -163,7 +164,9 @@ export default function CsvVisualizer() {
             </button>
             <button
               onClick={handleNext}
-              disabled={!!(metadata && offset + PAGE_SIZE >= metadata.total_rows)}
+              disabled={
+                !!(metadata && offset + PAGE_SIZE >= metadata.total_rows)
+              }
               className={`bg-indigo-600 text-white px-4 py-1 rounded transition-colors ${metadata && offset + PAGE_SIZE >= metadata.total_rows ? "opacity-50 cursor-not-allowed" : "hover:bg-indigo-500"}`}
             >
               Next
