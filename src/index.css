@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
 @font-face {
-  font-family: 'Urbanist';
-  src: url('./src/assets/Urbanist.ttf') format('truetype');
+    font-family: "Urbanist";
+    src: url("./src/assets/Urbanist.ttf") format("truetype");
 }
 
 @font-face {
-  font-family: 'Urbanist Italic';
-  src: url('./src/assets/Urbanist-Italic.ttf') format('truetype');
+    font-family: "Urbanist Italic";
+    src: url("./src/assets/Urbanist-Italic.ttf") format("truetype");
 }
 
 .italic-text {
-  font-family: 'Urbanist Italic', cursive;
+    font-family: "Urbanist Italic", cursive;
 }
 
 :root {
@@ -19,6 +19,11 @@
     --surface-color: #bfc0c0;
     --primary-color: #ef8354;
     --secondary-color: #4f5d75;
+    --accent-color: #7c6cff;
+    --accent-muted: #5a4fcf;
+    --text-primary: #f5f7ff;
+    --text-secondary: #a9b0c3;
+    --border-color: #3b3f5c;
 }
 
 html,
@@ -26,23 +31,29 @@ body,
 #root {
     height: 100%;
     margin: 0;
-    font-family: 'Urbanist', sans-serif;
+    font-family: "Urbanist", sans-serif;
     color: #ffffff;
     background-color: var(--background-color);
 }
 
 @keyframes fadeingOutIn {
-  0% { opacity: 1; }
-  50% { opacity: 0; }
-  100% { opacity: 1; }
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
 }
 
 .fadeState {
-  animation: fadeingOutIn 0.6s ease-in-out;
+    animation: fadeingOutIn 0.6s ease-in-out;
 }
 
 fieldset {
-	font-weight: bolder;
+    font-weight: bolder;
 }
 
 select {

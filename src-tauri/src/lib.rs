@@ -14,14 +14,24 @@ pub fn run() {
 
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct GraphData {
+    pub id: String,
+    pub x_col_idx: usize,
+    pub y_col_idx: usize,
+    pub name: String,
+    pub csv_path: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Project {
     pub name: String,
     pub path: String,
     pub created_at: String,
     pub csv_files: Vec<CsvFileConfig>,
+    pub csv_graphs: Vec<GraphData>,
 }
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CsvFileConfig {
     pub path: String,
     pub is_visible: bool,
@@ -39,6 +49,7 @@ fn create_project(path: String, name: String) -> Result<String, String> {
         path: path.clone(),
         created_at: local_date.to_string(),
         csv_files: vec![],
+        csv_graphs: vec![],
     };
     let json_data = serde_json::to_string_pretty(&new_project).map_err(|e| e.to_string())?;
 
