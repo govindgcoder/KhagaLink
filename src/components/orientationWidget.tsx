@@ -9,13 +9,15 @@ interface OrientationWidgetProps {
   yCol: number;
   zCol: number;
   headers: string[];
-  onConfigChange: (config: Partial<{
-    wCol: number;
-    xCol: number;
-    yCol: number;
-    zCol: number;
-    enabled: boolean;
-  }>) => void;
+  onConfigChange: (
+    config: Partial<{
+      wCol: number;
+      xCol: number;
+      yCol: number;
+      zCol: number;
+      enabled: boolean;
+    }>,
+  ) => void;
 }
 
 interface CylinderProps {
@@ -61,8 +63,8 @@ export function OrientationWidget({
   const quatConfig = useProjectStore((s) => s.telemetryQuatConfig);
   quatConfig.enabled = true;
   return (
-    <div className="flex flex-col gap-2 my-4">
-      <div className="flex flex-wrap gap-2 items-center text-xs bg-gray-600 justify-evenly">
+    <div className="flex flex-col gap-2 my-4 p-4 border-[var(--border-color)] bg-[var(--secondary-color)] rounded-2xl">
+      <div className="flex flex-wrap gap-2 items-center text-xs bg-[--tertiary-color] justify-start">
         <select
           value={wCol}
           onChange={(e) => onConfigChange({ wCol: +e.target.value })}

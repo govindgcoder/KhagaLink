@@ -96,7 +96,7 @@ function GraphWidgetComponent({
   }, [widget.data.length, context]); // Run this every time a new data point is added
 
   return (
-    <div className="bg-[var(--secondary-color)] border border-slate-800 rounded-lg p-4 flex flex-col gap-4 shadow-lg h-[400px] shrink-0">
+    <div className="bg-[var(--secondary-color)] border border-[var(--border-color)] rounded-lg p-4 flex flex-col gap-4 shadow-lg h-[400px] shrink-0">
       <div className="flex justify-between items-center border-b border-slate-800 pb-2">
         <div className="flex gap-4 items-center text-xs">
           <span className="text-emerald-400 font-bold font-mono">X-Axis:</span>

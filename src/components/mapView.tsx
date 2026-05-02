@@ -29,8 +29,8 @@ export function MapWidget({ headers, onConfigChange }: MapWidgetProps) {
   const position = useProjectStore((s) => s.latestPosition);
 
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex flex-wrap gap-2 items-center text-xs bg-gray-600 justify-evenly">
+    <div className="flex flex-col gap-2 h-56 border p-4 border-[var(--border-color)] bg-[var(--secondary-color)] rounded-2xl">
+      <div className="flex flex-wrap gap-2 items-center text-xs bg-[--tertiary-color] justify-evenly">
         <label>Latitude:</label>
         <select onChange={(e) => onConfigChange({ latCol: +e.target.value })}>
           {headers.map((h, i) => (

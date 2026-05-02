@@ -18,7 +18,7 @@
     --background-color: #2d3142;
     --surface-color: #bfc0c0;
     --primary-color: #ef8354;
-    --secondary-color: #4f5d75;
+    --secondary-color: #2f3847;
     --accent-color: #7c6cff;
     --accent-muted: #5a4fcf;
     --text-primary: #f5f7ff;
@@ -57,5 +57,9 @@ fieldset {
 }
 
 select {
-    background-color: var(--secondary-color);
+    background-color: var(--tertiary-color);
+}
+
+p {
+    color: var(--text-primary);
 }
