@@ -16,10 +16,8 @@
 
 :root {
     --background-color: #2d3142;
-    --surface-color: #bfc0c0;
-    --primary-color: #ef8354;
-    --secondary-color: #2f3847;
     --accent-color: #7c6cff;
+    --secondary-color: #2f3847;
     --accent-muted: #5a4fcf;
     --text-primary: #f5f7ff;
     --text-secondary: #a9b0c3;
@@ -32,7 +30,7 @@ body,
     height: 100%;
     margin: 0;
     font-family: "Urbanist", sans-serif;
-    color: #ffffff;
+    color: var(--text-primary);
     background-color: var(--background-color);
 }
 

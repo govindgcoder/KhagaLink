@@ -2,7 +2,13 @@ import "react";
 import { useEffect, useState } from "react";
 import ProjectLoader from "./projectLoader";
 import ProjectCreator from "./projectCreator";
+import Settings from "./Settings";
+import About from "./About";
 import { useGlobalStore, useProjectStore } from "../stores/useStore";
+
+type HomeProps = {
+  onNavigate?: (view: string) => void;
+};
 
 const normalizePath = (p: string) =>
   p
@@ -10,9 +16,11 @@ const normalizePath = (p: string) =>
     .replace(/\/+$/, "")
     .replace(/\/project\.json$/, "");
 
-export default function Home() {
+export default function Home({ onNavigate }: HomeProps) {
   const [isNewProject, setIsNewProject] = useState(false);
   const [isLoadProject, setIsLoadProject] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
 
   const [path, setPath] = useState("");
 
@@ -33,6 +41,9 @@ export default function Home() {
       alert("Please select a project file");
       return;
     }
+    if (onNavigate) {
+      onNavigate("Project");
+    }
     const normalizedPath = normalizePath(pathURL);
     await loadProject(normalizedPath);
     loadView("Project");
@@ -48,6 +59,20 @@ export default function Home() {
   const handleLoadProjectUI = () => {
     if (isLoadProject) return;
     setIsLoadProject(!isLoadProject);
+  };
+
+  const handleSettings = () => {
+    setShowSettings(true);
+    setShowAbout(false);
+    setIsNewProject(false);
+    setIsLoadProject(false);
+  };
+
+  const handleAbout = () => {
+    setShowAbout(true);
+    setShowSettings(false);
+    setIsNewProject(false);
+    setIsLoadProject(false);
   };
 
   const [menu, setMenu] = useState({ visible: false, x: 0, y: 0 });
@@ -113,16 +138,16 @@ export default function Home() {
               Load Existing Project
             </button>
             <div className="w-full">
-              <div className="w-full h-0.5 bg-[var(--border-color)]/40"></div>
+              <div className="invisible md:visible w-full h-0.5 bg-[var(--border-color)]/40"></div>
             </div>
             <button
-              onClick={() => {}}
+              onClick={handleSettings}
               className="w-full rounded-xl px-4 py-3 bg-[--tertiary-color] hover:bg-[var(--accent-color)]/20 border border-[var(--border-color)] text-[var(--text-secondary)] text-left font-medium"
             >
               Settings
             </button>
             <button
-              onClick={() => {}}
+              onClick={handleAbout}
               className="w-full rounded-xl px-4 py-3 bg-[--tertiary-color] hover:bg-[var(--accent-color)]/20 border border-[var(--border-color)] text-[var(--text-secondary)] text-left font-medium"
             >
               About
@@ -160,12 +185,16 @@ export default function Home() {
           </div>
         )}
 
-        <h1 className="text-4xl mb-4 text-[--text-primary] tracking-wide">
-          Projects
-        </h1>
+        {showSettings && <Settings onBack={() => setShowSettings(false)} />}
+        {showAbout && <About onBack={() => setShowAbout(false)} />}
+        {!showSettings && !showAbout && (
+          <>
+            <h1 className="text-4xl mb-4 text-[--text-primary] tracking-wide">
+              Projects
+            </h1>
 
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-wrap gap-4">
+            <div className="max-w-7xl mx-auto">
+              <div className="flex flex-wrap gap-4">
             {projectList.length > 0 ? (
               projectList.map((project) => (
                 <div
@@ -196,9 +225,11 @@ export default function Home() {
           </div>
 
           <div className="mt-6 md:hidden text-xs text-gray-400">
-            v1.0, @govindgcoder
+              v1.0, @govindgcoder
+            </div>
           </div>
-        </div>
+          </>
+        )}
       </main>
     </div>
   );

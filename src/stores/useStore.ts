@@ -7,7 +7,10 @@ import { createJSONStorage } from "zustand/middleware";
 type view = "Home" | "Project";
 
 const normalizePath = (p: string) =>
-  p.replace(/\\/g, "/").replace(/\/+$/, "").replace(/\/project\.json$/, "");
+  p
+    .replace(/\\/g, "/")
+    .replace(/\/+$/, "")
+    .replace(/\/project\.json$/, "");
 
 interface CsvFileConfig {
   path: string;
@@ -300,7 +303,11 @@ export const useProjectStore = create<ProjectState>()(
 
       loadProject: async (path: string) => {
         try {
-          set({ currentCSVmetadata: null, currentCSVrows: null, csvGraphs: [] });
+          set({
+            currentCSVmetadata: null,
+            currentCSVrows: null,
+            csvGraphs: [],
+          });
 
           const normalizedPath = path
             .replace(/\\/g, "/")
@@ -311,24 +318,29 @@ export const useProjectStore = create<ProjectState>()(
           const project = await invoke<Project>("load_project", {
             path: jsonPath,
           });
-          
+
           const csvGraphConfigs = project.csv_graphs || [];
-          const loadedCsvGraphs: GraphWidget[] = csvGraphConfigs.map((g: GraphWidgetConfig) => ({
-            id: g.id,
-            x_col_idx: g.x_col_idx,
-            y_col_idx: g.y_col_idx,
-            name: g.name,
-            csv_path: g.csv_path,
-            data: [],
-          }));
-          
+          const loadedCsvGraphs: GraphWidget[] = csvGraphConfigs.map(
+            (g: GraphWidgetConfig) => ({
+              id: g.id,
+              x_col_idx: g.x_col_idx,
+              y_col_idx: g.y_col_idx,
+              name: g.name,
+              csv_path: g.csv_path,
+              data: [],
+            }),
+          );
+
           const projectWithCorrectPath = {
             ...project,
             path: normalizedPath,
             csv_graphs: csvGraphConfigs,
           };
-          
-          set({ current_project: projectWithCorrectPath, csvGraphs: loadedCsvGraphs });
+
+          set({
+            current_project: projectWithCorrectPath,
+            csvGraphs: loadedCsvGraphs,
+          });
 
           useGlobalStore.getState().addProject(projectWithCorrectPath);
           return true;
@@ -362,6 +374,7 @@ export const useProjectStore = create<ProjectState>()(
 
         set({ current_project: updated_project });
         await invoke("save_project", { project: updated_project });
+        useGlobalStore.getState().addProject(updated_project);
       },
 
       delCsvFromList: async (path: string) => {
@@ -377,6 +390,7 @@ export const useProjectStore = create<ProjectState>()(
 
         set({ current_project: updated_project });
         await invoke("save_project", { project: updated_project });
+        useGlobalStore.getState().addProject(updated_project);
       },
 
       csvGraphs: [],
@@ -384,8 +398,9 @@ export const useProjectStore = create<ProjectState>()(
 
       addCsvGraph: async (csvPath: string = "") => {
         const current_project = get().current_project;
-        const defaultCsvPath = csvPath || (current_project?.csv_files?.[0]?.path || "");
-        
+        const defaultCsvPath =
+          csvPath || current_project?.csv_files?.[0]?.path || "";
+
         const newGraph: GraphWidget = {
           id: crypto.randomUUID(),
           x_col_idx: 0,
@@ -394,12 +409,12 @@ export const useProjectStore = create<ProjectState>()(
           csv_path: defaultCsvPath,
           data: [],
         };
-        
+
         const updatedGraphs = [...get().csvGraphs, newGraph];
         set({ csvGraphs: updatedGraphs });
-        
+
         if (current_project) {
-          const config: GraphWidgetConfig[] = updatedGraphs.map(g => ({
+          const config: GraphWidgetConfig[] = updatedGraphs.map((g) => ({
             id: g.id,
             x_col_idx: g.x_col_idx,
             y_col_idx: g.y_col_idx,
@@ -409,6 +424,7 @@ export const useProjectStore = create<ProjectState>()(
           const updatedProject = { ...current_project, csv_graphs: config };
           set({ current_project: updatedProject });
           await invoke("save_project", { project: updatedProject });
+          useGlobalStore.getState().addProject(updatedProject);
         }
       },
 
@@ -433,11 +449,13 @@ export const useProjectStore = create<ProjectState>()(
 
       removeCsvGraph: (id: string) => {
         const current_project = get().current_project;
-        const updatedGraphs = get().csvGraphs.filter((graph) => graph.id !== id);
+        const updatedGraphs = get().csvGraphs.filter(
+          (graph) => graph.id !== id,
+        );
         set({ csvGraphs: updatedGraphs });
-        
+
         if (current_project) {
-          const config: GraphWidgetConfig[] = updatedGraphs.map(g => ({
+          const config: GraphWidgetConfig[] = updatedGraphs.map((g) => ({
             id: g.id,
             x_col_idx: g.x_col_idx,
             y_col_idx: g.y_col_idx,
@@ -447,6 +465,7 @@ export const useProjectStore = create<ProjectState>()(
           const updatedProject = { ...current_project, csv_graphs: config };
           set({ current_project: updatedProject });
           invoke("save_project", { project: updatedProject });
+          useGlobalStore.getState().addProject(updatedProject);
         }
       },
 
@@ -459,12 +478,14 @@ export const useProjectStore = create<ProjectState>()(
           const current_project = get().current_project;
           set({
             csvGraphs: get().csvGraphs.map((g) =>
-              g.id === id ? { ...g, x_col_idx: xCol, y_col_idx: yCol, csv_path: path } : g,
+              g.id === id
+                ? { ...g, x_col_idx: xCol, y_col_idx: yCol, csv_path: path }
+                : g,
             ),
           });
-          
+
           if (current_project) {
-            const config: GraphWidgetConfig[] = get().csvGraphs.map(g => ({
+            const config: GraphWidgetConfig[] = get().csvGraphs.map((g) => ({
               id: g.id,
               x_col_idx: g.x_col_idx,
               y_col_idx: g.y_col_idx,
@@ -474,6 +495,7 @@ export const useProjectStore = create<ProjectState>()(
             const updatedProject = { ...current_project, csv_graphs: config };
             set({ current_project: updatedProject });
             invoke("save_project", { project: updatedProject });
+            useGlobalStore.getState().addProject(updatedProject);
           }
         } else {
           set({

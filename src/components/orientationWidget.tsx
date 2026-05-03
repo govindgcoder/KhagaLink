@@ -20,7 +20,7 @@ interface OrientationWidgetProps {
   ) => void;
 }
 
-interface CylinderProps {
+interface TrigonalPyramidProps {
   quaternion: {
     w: number;
     x: number;
@@ -29,9 +29,11 @@ interface CylinderProps {
   };
 }
 
-function Cylinder({ quaternion }: CylinderProps) {
+// pyramid mesh
+function TrigonalPyramid({ quaternion }: TrigonalPyramidProps) {
   const meshRef = useRef<THREE.Mesh>(null);
 
+  // apply quaternion rotation
   useEffect(() => {
     if (!meshRef.current) return;
 
@@ -45,8 +47,8 @@ function Cylinder({ quaternion }: CylinderProps) {
 
   return (
     <mesh ref={meshRef}>
-      <cylinderGeometry args={[0.75, 0.75, 5, 16]} />
-      <meshStandardMaterial color="#8b5cf6" />
+      <tetrahedronGeometry args={[2, 0]} />
+      <meshStandardMaterial color="#7653fc" />
     </mesh>
   );
 }
@@ -62,8 +64,10 @@ export function OrientationWidget({
   const quat = useProjectStore((s) => s.latestQuaternion);
   const quatConfig = useProjectStore((s) => s.telemetryQuatConfig);
   quatConfig.enabled = true;
+
   return (
     <div className="flex flex-col gap-2 my-4 p-4 border-[var(--border-color)] bg-[var(--secondary-color)] rounded-2xl">
+      {/* config selectors */}
       <div className="flex flex-wrap gap-2 items-center text-xs bg-[--tertiary-color] justify-start">
         <select
           value={wCol}
@@ -110,10 +114,11 @@ export function OrientationWidget({
         </select>
       </div>
 
-      <Canvas style={{ height: "200px" }} camera={{ position: [3, 3, 3] }}>
-        <ambientLight intensity={0.5} />
+      {/* 3d preview */}
+      <Canvas style={{ height: "200px" }} camera={{ position: [2, 2, 2] }}>
+        <ambientLight intensity={0.4} />
         <directionalLight position={[5, 5, 5]} />
-        <Cylinder quaternion={quat} />
+        <TrigonalPyramid quaternion={quat} />
       </Canvas>
     </div>
   );

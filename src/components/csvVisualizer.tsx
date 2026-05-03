@@ -78,7 +78,7 @@ export default function CsvVisualizer() {
 
   return (
     <div
-      className="p-8 flex flex-col gap-4 h-full bg-[var(--background-color)] rounded-xl overflow-y-auto hide-scrollbar"
+      className="p-8 flex flex-col gap-4 min-h-0 bg-[var(--background-color)] rounded-xl overflow-y-auto hide-scrollbar"
       style={{
         msOverflowStyle: "none", // IE and Edge
         scrollbarWidth: "none", // Firefox
