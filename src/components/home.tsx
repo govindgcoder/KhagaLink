@@ -23,6 +23,7 @@ export default function Home({ onNavigate }: HomeProps) {
   const [showAbout, setShowAbout] = useState(false);
 
   const [path, setPath] = useState("");
+  const [menu, setMenu] = useState({ visible: false, x: 0, y: 0 });
 
   const projectList = useGlobalStore((state) => state.projects);
 
@@ -51,16 +52,6 @@ export default function Home({ onNavigate }: HomeProps) {
 
   const loadView = useProjectStore((state) => state.load_view);
 
-  const handleNewProjectUI = () => {
-    if (isNewProject) return;
-    setIsNewProject(!isNewProject);
-  };
-
-  const handleLoadProjectUI = () => {
-    if (isLoadProject) return;
-    setIsLoadProject(!isLoadProject);
-  };
-
   const handleSettings = () => {
     setShowSettings(true);
     setShowAbout(false);
@@ -73,19 +64,6 @@ export default function Home({ onNavigate }: HomeProps) {
     setShowSettings(false);
     setIsNewProject(false);
     setIsLoadProject(false);
-  };
-
-  const [menu, setMenu] = useState({ visible: false, x: 0, y: 0 });
-
-  const handleMenuTrigger = (
-    e: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    path: string,
-  ) => {
-    if (e.type === "contextmenu") e.preventDefault();
-
-    // Set position and show custom menu
-    setPath(path);
-    setMenu({ visible: true, x: e.pageX, y: e.pageY });
   };
 
   const closeMenu = () => setMenu({ ...menu, visible: false });

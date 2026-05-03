@@ -153,10 +153,14 @@ export const useGlobalStore = create<ProjectList>()(
       },
       /* create a new project array without the given project based on it's path */
       deleteProject: async (path: string) => {
-        await invoke("delete_project", { path: path });
-        set({
-          projects: get().projects.filter((project) => project.path !== path),
-        });
+        try {
+          await invoke("delete_project", { path: path });
+          set({
+            projects: get().projects.filter((project) => project.path !== path),
+          });
+        } catch (err) {
+          alert(`Failed to delete project: ${err}`);
+        }
       },
 
       validateProjectPaths: async (projects: Project[]) => {
@@ -322,6 +326,15 @@ export const useProjectStore = create<ProjectState>()(
           });
 
           const csvGraphConfigs = project.csv_graphs || [];
+          
+          const validCsvFiles = await Promise.all(
+            (project.csv_files || []).map(async (csv) => {
+              const exists = await invoke<boolean>("check_path_exists", { path: csv.path });
+              return exists ? csv : null;
+            })
+          );
+          const filteredCsvFiles = validCsvFiles.filter(Boolean) as CsvFileConfig[];
+
           const loadedCsvGraphs: GraphWidget[] = csvGraphConfigs.map(
             (g: GraphWidgetConfig) => ({
               id: g.id,
@@ -337,6 +350,7 @@ export const useProjectStore = create<ProjectState>()(
             ...project,
             path: normalizedPath,
             csv_graphs: csvGraphConfigs,
+            csv_files: filteredCsvFiles,
           };
 
           set({
@@ -345,6 +359,12 @@ export const useProjectStore = create<ProjectState>()(
           });
 
           useGlobalStore.getState().addProject(projectWithCorrectPath);
+
+          for (const graph of loadedCsvGraphs) {
+            if (graph.csv_path) {
+              get().updateGraphData(graph.id, graph.x_col_idx, graph.y_col_idx, graph.csv_path, "csv");
+            }
+          }
           return true;
         } catch (err) {
           console.error("Failed to load project: ", err);

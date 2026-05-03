@@ -12,7 +12,6 @@ export default function ProjectDashboard() {
 
   const [selectedTab, setSelectedTab] = useState("csv");
   const [showLoading, setShowLoading] = useState(false);
-  const [pendingTab, setPendingTab] = useState<string | null>(null);
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -36,11 +35,9 @@ export default function ProjectDashboard() {
 
   const handleTabChange = (tab: string) => {
     if (tab !== selectedTab) {
-      setPendingTab(tab);
       setShowLoading(true);
       setTimeout(() => {
         setSelectedTab(tab);
-        setPendingTab(null);
         setShowLoading(false);
       }, 800);
     }

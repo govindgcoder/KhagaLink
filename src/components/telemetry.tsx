@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { useProjectStore } from "../stores/useStore";
 import GraphWidgetComponent from "./GraphWidgetComponent";
 import { MapWidget } from "./mapView";
@@ -8,7 +8,6 @@ import { DataRateWidget } from "./DataRateWidget";
 export default function Telemetry() {
   const [port, setPort] = useState("");
   const [baudRate, setBaudRate] = useState(9600);
-  const [isConnected, setIsConnected] = useState(false);
 
   const dialogRef = useRef<HTMLDialogElement | null>(null);
 
@@ -21,7 +20,6 @@ export default function Telemetry() {
 
   const handleConnect = () => {
     connectToHardware(port, baudRate);
-    setIsConnected(true);
     closeModal();
   };
 
@@ -43,8 +41,7 @@ export default function Telemetry() {
   );
   const handleDisconnect = () => {
     disconnectHardware();
-    setPort(""); // Clear port state
-    setIsConnected(false);
+    setPort("");
   };
 
   return (

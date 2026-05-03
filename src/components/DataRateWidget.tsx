@@ -6,15 +6,15 @@ export function DataRateWidget() {
   const telemetryDataLog = useProjectStore((s) => s.telemetryDataLog);
   const telemetryHeaders = useProjectStore((s) => s.telemetryHeaders);
 
-  const handleExportCSV = () => {
+const handleExportCSV = () => {
     if (telemetryDataLog.length === 0) {
       alert("No telemetry data to export");
       return;
     }
-    const headers =
-      telemetryHeaders.length > 0
-        ? telemetryHeaders
-        : telemetryDataLog[0].map((_: string, i: number) => `Field ${i}`);
+    const headers = telemetryHeaders.length > 0 
+      ? telemetryHeaders 
+      : telemetryDataLog[0]?.map((_: string, i: number) => `Field ${i}`) 
+      || [];
     const csvContent = [
       headers.join(","),
       ...telemetryDataLog.map((row: string[]) => row.join(",")),
