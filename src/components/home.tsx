@@ -108,14 +108,22 @@ export default function Home() {
                 setIsNewProject(false);
                 setIsLoadProject(true);
               }}
-              className="w-full rounded-xl px-4 py-3 bg-[var(--secondary-color)] hover:opacity-90 transition-all text-left font-medium"
+              className="w-full rounded-xl px-4 py-3 bg-[var(--secondary-color)] hover:opacity-60 transition-all text-left font-medium"
             >
               Load Existing Project
             </button>
-
+            <div className="w-full">
+              <div className="w-full h-0.5 bg-[var(--border-color)]/40"></div>
+            </div>
             <button
               onClick={() => {}}
-              className="w-full rounded-xl px-4 py-3 bg-[--tertiary-color] border border-[var(--border-color)] text-[var(--text-secondary)] text-left font-medium"
+              className="w-full rounded-xl px-4 py-3 bg-[--tertiary-color] hover:bg-[var(--accent-color)]/20 border border-[var(--border-color)] text-[var(--text-secondary)] text-left font-medium"
+            >
+              Settings
+            </button>
+            <button
+              onClick={() => {}}
+              className="w-full rounded-xl px-4 py-3 bg-[--tertiary-color] hover:bg-[var(--accent-color)]/20 border border-[var(--border-color)] text-[var(--text-secondary)] text-left font-medium"
             >
               About
             </button>

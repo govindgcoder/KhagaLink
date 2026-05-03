@@ -170,7 +170,13 @@ export default function Telemetry() {
           </div>
         </div>
 
-        <div className="flex flex-col flex-[6] h-fit max-h-full  overflow-y-auto gap-1">
+        <div
+          className="flex flex-col flex-[6] h-fit max-h-full  overflow-y-auto gap-1"
+          style={{
+            msOverflowStyle: "none", // IE and Edge
+            scrollbarWidth: "none", // Firefox
+          }}
+        >
           <MapWidget
             latCol={telemetryMapConfig.latCol}
             longCol={telemetryMapConfig.longCol}

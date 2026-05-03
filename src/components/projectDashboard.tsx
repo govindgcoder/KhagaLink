@@ -113,9 +113,13 @@ export default function ProjectDashboard() {
           id="sidebar"
           className={`${
             isSidebarOpen ? "w-full md:w-72" : "w-full md:w-22"
-          } shrink-0 border-b md:border-b-0 md:border-r border-[var(--border-color)] bg-[var(--background-color)] backdrop-blur-sm px-4 py-6 flex md:min-h-screen flex-row md:flex-col items-center md:items-stretch justify-between md:justify-start gap-4 transition-all duration-150 ease-in-out`}
+          } shrink-0 border-b md:border-b-0 md:border-r border-[var(--border-color)] bg-[var(--background-color)] backdrop-blur-sm px-4 py-6 flex md:h-screen flex-row md:flex-col items-center md:items-stretch justify-between md:justify-start gap-4 transition-all duration-150 ease-in-out hide-scrollbar`}
+          style={{
+            msOverflowStyle: "none", // IE and Edge
+            scrollbarWidth: "none", // Firefox
+          }}
         >
-          <div className="w-full flex flex-row md:flex-col items-center md:items-stretch justify-between md:justify-start gap-4">
+          <div className="w-full h-full flex flex-row md:flex-col items-center md:items-stretch justify-between md:justify-start gap-4">
             <div
               className={`flex items-center ${
                 isSidebarOpen ? "justify-start gap-3" : "justify-center"
@@ -149,7 +153,7 @@ export default function ProjectDashboard() {
               )}
             </div>
 
-            <div className="md:mt-6 flex flex-row md:flex-col gap-3 w-fit md:w-full">
+            <div className="md:mt-6 flex flex-row md:flex-col gap-3 w-fit md:w-full h-full">
               <button
                 type="button"
                 className={`rounded-xl px-4 py-3 transition-all font-medium ${
@@ -163,7 +167,7 @@ export default function ProjectDashboard() {
                 }`}
                 onClick={() => setSelectedTab("csv")}
               >
-                csv
+                CSV
               </button>
 
               <button
@@ -179,33 +183,26 @@ export default function ProjectDashboard() {
                 }`}
                 onClick={() => setSelectedTab("tele")}
               >
-                {isSidebarOpen ? "telemetry" : "tele"}
+                {isSidebarOpen ? "Telemetry" : "tele"}
               </button>
-
               <button
                 type="button"
-                className={`rounded-xl px-4 py-3 transition-all font-medium bg-[var(--tertiary-color)] text-[var(--text-secondary)] hover:opacity-90 ${
+                className={`mt-auto rounded-xl px-4 py-3 transition-all font-medium bg-[var(--tertiary-color)] hover:bg-[var(--teritary-color)]/20 border border-[var(--border-color)] text-[var(--text-secondary)] hover:opacity-90 ${
                   isSidebarOpen
                     ? "w-full text-left"
                     : "w-fit md:w-full text-center"
                 }`}
                 onClick={handleExit}
               >
-                exit
+                Exit
               </button>
             </div>
           </div>
-
-          <div
-            className="hidden md:block mt-auto w-full flex-1 cursor-pointer hover:bg-[rgba(255,255,255,0.02)] rounded-xl transition-colors"
-            onClick={handleToggleSideBar}
-            aria-label="Toggle Sidebar"
-          />
         </aside>
 
         <main
           id="main-csv-content"
-          className="relative flex-1 overflow-auto bg-[var(--background-color)]"
+          className="relative h-screen flex-1 overflow-auto bg-[var(--background-color)]"
         >
           {selectedTab === "csv" ? <CsvVisualizer /> : <Telemetry />}
         </main>
