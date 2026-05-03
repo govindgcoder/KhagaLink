@@ -353,6 +353,10 @@ export const useProjectStore = create<ProjectState>()(
             csv_files: filteredCsvFiles,
           };
 
+          if (filteredCsvFiles.length !== (project.csv_files || []).length) {
+            await invoke("save_project", { project: projectWithCorrectPath });
+          }
+
           set({
             current_project: projectWithCorrectPath,
             csvGraphs: loadedCsvGraphs,

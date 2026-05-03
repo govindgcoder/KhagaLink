@@ -183,8 +183,7 @@ fn delete_project(path: String)-> Result<(), String>{
 
 #[tauri::command]
 fn check_path_exists(path: String)-> bool {
-	let file_path = Path::new(&path).join("project.json");
-	return file_path.exists();
+	Path::new(&path).exists()
 }
 
 // for rust serial

@@ -116,7 +116,7 @@ export function OrientationWidget({
 
       {/* 3d preview */}
       <Canvas style={{ height: "200px" }} camera={{ position: [2, 2, 2] }}>
-        <ambientLight intensity={0.4} />
+        <ambientLight intensity={1} />
         <directionalLight position={[5, 5, 5]} />
         <TrigonalPyramid quaternion={quat} />
       </Canvas>
