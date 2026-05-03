@@ -171,7 +171,7 @@ export default function Telemetry() {
         </div>
 
         <div
-          className="flex flex-col flex-[6] h-fit max-h-full  overflow-y-auto gap-1"
+          className="flex flex-col flex-[6] h-fit max-h-full  overflow-y-auto gap-0"
           style={{
             msOverflowStyle: "none", // IE and Edge
             scrollbarWidth: "none", // Firefox

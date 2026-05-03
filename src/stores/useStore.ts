@@ -98,6 +98,7 @@ interface ProjectState {
   connectToHardware: (port: string, baud: number) => Promise<void>;
   disconnectHardware: () => Promise<void>;
   telemetryHeaders: string[];
+  telemetryDataLog: string[][];
 
   telemetryMapConfig: MapConfig;
   setMapConfig: (config: Partial<MapConfig>) => void;
@@ -202,6 +203,7 @@ export const useProjectStore = create<ProjectState>()(
       currentCSVmetadata: null,
 
       telemetryHeaders: [],
+      telemetryDataLog: [],
       telemetryMapConfig: { latCol: 0, longCol: 0, enabled: false },
       latestPosition: null,
 
@@ -681,7 +683,10 @@ export const useProjectStore = create<ProjectState>()(
                 );
 
                 // Return a brand new state object
-                return { telemetryGraphs: updatedGraphs };
+                return { 
+                  telemetryGraphs: updatedGraphs,
+                  telemetryDataLog: [...state.telemetryDataLog, stringVals].slice(-10000),
+                };
               });
             },
           );
@@ -710,8 +715,9 @@ export const useProjectStore = create<ProjectState>()(
             unlistenTelemetry();
             unlistenTelemetry = null;
           }
-          set({
+set({
             telemetryHeaders: [],
+            telemetryDataLog: [],
             telemetryGraphs: get().telemetryGraphs.map((g) => ({
               ...g,
               data: [],

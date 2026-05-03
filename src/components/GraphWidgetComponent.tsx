@@ -7,7 +7,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
 } from "recharts";
 import { useEffect, useRef } from "react";
 
@@ -70,12 +69,28 @@ function GraphWidgetComponent({
         context,
       );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentCsvPath]);
 
   const chartWidth = Math.max(window.innerWidth * 0.4, widget.data.length * 10);
 
   const scrollRef = useRef<HTMLDivElement>(null);
+  const chartContainerRef = useRef<HTMLDivElement>(null);
+
+  const handleExportSVG = () => {
+    const container = chartContainerRef.current;
+    if (!container) return;
+    const svg = container.querySelector("svg");
+    if (!svg) return;
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const blob = new Blob([svgData], { type: "image/svg+xml" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${widget.name || "graph"}.svg`;
+    a.click();
+    URL.revokeObjectURL(url);
+    alert("SVG exported successfully! Check Downloads.");
+  };
 
   // smart Auto-Scroll for Telemetry
   useEffect(() => {
@@ -128,16 +143,23 @@ function GraphWidgetComponent({
             ))}
           </select>
         </div>
-
-        <button
-          onClick={() => removeGraphWidget(widget.id)}
-          className="text-red-400 hover:bg-red-500/20 text-xs px-3 py-1 rounded transition-colors"
-        >
-          Remove
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={handleExportSVG}
+            className="text-blue-400 hover:bg-blue-500/20 text-xs px-3 py-1 rounded transition-colors"
+          >
+            Export SVG
+          </button>
+          <button
+            onClick={() => removeGraphWidget(widget.id)}
+            className="text-red-400 hover:bg-red-500/20 text-xs px-3 py-1 rounded transition-colors"
+          >
+            Remove
+          </button>
+        </div>
       </div>
 
-      <div className="flex-1 w-full min-h-0">
+      <div ref={chartContainerRef} className="flex-1 w-full min-h-0">
         {widget.data.length === 0 ? (
           <div className="h-full w-full flex items-center justify-center text-slate-500 font-mono">
             Select columns to load data...

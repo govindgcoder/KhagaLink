@@ -66,7 +66,7 @@ export function OrientationWidget({
   quatConfig.enabled = true;
 
   return (
-    <div className="flex flex-col gap-2 my-4 p-4 border-[var(--border-color)] bg-[var(--secondary-color)] rounded-2xl">
+    <div className="flex flex-col gap-2 my-2.5 p-4 border-[var(--border-color)] bg-[var(--secondary-color)] rounded-2xl">
       {/* config selectors */}
       <div className="flex flex-wrap gap-2 items-center text-xs bg-[--tertiary-color] justify-start">
         <select
