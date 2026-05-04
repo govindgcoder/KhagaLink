@@ -1,5 +1,6 @@
 import { useProjectStore } from "../stores/useStore";
 
+// data rate widget - shows packet rate and loss statistics
 export function DataRateWidget() {
   const dataRate = useProjectStore((s) => s.dataRate);
   const lossRate = useProjectStore((s) => s.lossRate);

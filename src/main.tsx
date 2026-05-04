@@ -9,6 +9,7 @@ import "./index.css";
 // });
 
 
+// react entry point - renders app to DOM
 ReactDOM.createRoot(document.getElementById("root")!).render(
 	<React.StrictMode>
 		<div style={{ minWidth: "800px" }}>

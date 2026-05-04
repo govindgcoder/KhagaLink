@@ -6,17 +6,20 @@ import { createJSONStorage } from "zustand/middleware";
 
 type view = "Home" | "Project";
 
+// normalizes path separators for cross-platform consistency
 const normalizePath = (p: string) =>
   p
     .replace(/\\/g, "/")
     .replace(/\/+$/, "")
     .replace(/\/project\.json$/, "");
 
+// csv file configuration with visibility toggle
 interface CsvFileConfig {
   path: string;
   is_visible: boolean;
 }
 
+// graph widget configuration for persisting graph settings
 interface GraphWidgetConfig {
   id: string;
   x_col_idx: number;
@@ -25,6 +28,7 @@ interface GraphWidgetConfig {
   csv_path: string;
 }
 
+// project data structure
 interface Project {
   name: string;
   path: string;
@@ -33,6 +37,7 @@ interface Project {
   csv_graphs: GraphWidgetConfig[];
 }
 
+// project list store interface - manages list of all projects
 interface ProjectList {
   projects: Project[];
   addProject: (project: Project) => void;
@@ -40,6 +45,7 @@ interface ProjectList {
   validateProjectPaths: (project: Project[]) => void;
 }
 
+// runtime graph widget with live data
 export interface GraphWidget {
   id: string;
   x_col_idx: number;
@@ -49,12 +55,14 @@ export interface GraphWidget {
   data: { x: number; y: number }[];
 }
 
+// map widget configuration for lat/long columns
 interface MapConfig {
   latCol: number;
   longCol: number;
   enabled: boolean;
 }
 
+// orientation widget configuration for quaternion columns
 interface QuaternionConfig {
   wCol: number;
   xCol: number;
@@ -63,6 +71,7 @@ interface QuaternionConfig {
   enabled: boolean;
 }
 
+// main project state interface - handles current project and telemetry
 interface ProjectState {
   current_view: view | null;
   load_view: (view: view) => void;
@@ -123,12 +132,14 @@ interface CSVmetadata {
 let unlistenTelemetry: (() => void) | null = null;
 let unlistenDisconnect: (() => void) | null = null;
 
+// global store for project list - persists across sessions
 export const useGlobalStore = create<ProjectList>()(
   persist(
     (set, get) => ({
       // initial state
       projects: [],
 
+      // adds or updates a project in the list
       addProject: (project: Project) => {
         const normalizedPath = normalizePath(project.path);
 
@@ -151,7 +162,7 @@ export const useGlobalStore = create<ProjectList>()(
 
         set({ projects: updatedProjects });
       },
-      /* create a new project array without the given project based on it's path */
+      // deletes a project from the list and filesystem
       deleteProject: async (path: string) => {
         try {
           await invoke("delete_project", { path: path });
@@ -163,6 +174,7 @@ export const useGlobalStore = create<ProjectList>()(
         }
       },
 
+      // validates that project paths still exist, removes invalid ones
       validateProjectPaths: async (projects: Project[]) => {
         const invalidPaths: string[] = [];
         for (const project of projects) {
@@ -189,10 +201,12 @@ export const useGlobalStore = create<ProjectList>()(
   ),
 );
 
+// project store - manages current project state and operations
 export const useProjectStore = create<ProjectState>()(
   persist(
     (set, get) => ({
       current_view: "Home",
+      // switches current view between home and project
       load_view: (view: view) => {
         if (view === "Home") {
           set({ current_project: null, current_view: view });
@@ -226,6 +240,7 @@ export const useProjectStore = create<ProjectState>()(
       lossRate: 0,
       lastSeq: -1,
 
+      // creates a new project in the given path with the given name
       createProject: async (path: string, name: string) => {
         try {
           const normalizedPath = path
@@ -273,6 +288,7 @@ export const useProjectStore = create<ProjectState>()(
         }
       },
 
+      // loads csv file metadata (headers and row count)
       loadCSVmetadata: async (path: string) => {
         try {
           const new_csv_metadata = await invoke<CSVmetadata>(
@@ -289,6 +305,7 @@ export const useProjectStore = create<ProjectState>()(
 
       currentCSVrows: null,
 
+      // loads a window of csv rows for pagination display
       loadCSVrows: async (
         path: string,
         start_size: number,
@@ -307,6 +324,7 @@ export const useProjectStore = create<ProjectState>()(
         }
       },
 
+      // loads an existing project from the filesystem
       loadProject: async (path: string) => {
         try {
           set({
@@ -387,6 +405,7 @@ export const useProjectStore = create<ProjectState>()(
         }
       },
 
+      // adds a csv file to the current project
       addCsvToList: async (path: string) => {
         const current_project = get().current_project;
         if (!current_project) return;
@@ -413,6 +432,7 @@ export const useProjectStore = create<ProjectState>()(
         useGlobalStore.getState().addProject(updated_project);
       },
 
+      // removes a csv file from the current project
       delCsvFromList: async (path: string) => {
         const current_project = get().current_project;
         if (!current_project) return;
@@ -432,6 +452,7 @@ export const useProjectStore = create<ProjectState>()(
       csvGraphs: [],
       telemetryGraphs: [],
 
+      // adds a new csv graph widget to the project
       addCsvGraph: async (csvPath: string = "") => {
         const current_project = get().current_project;
         const defaultCsvPath =
@@ -464,6 +485,7 @@ export const useProjectStore = create<ProjectState>()(
         }
       },
 
+      // adds a new live telemetry graph widget
       addTelemetryGraph: () => {
         const newGraph: GraphWidget = {
           id: crypto.randomUUID(),
@@ -475,6 +497,7 @@ export const useProjectStore = create<ProjectState>()(
         set({ telemetryGraphs: [...get().telemetryGraphs, newGraph] });
       },
 
+      // removes a telemetry graph widget
       removeTelemetryGraph: (id: string) => {
         set({
           telemetryGraphs: get().telemetryGraphs.filter(
@@ -483,6 +506,7 @@ export const useProjectStore = create<ProjectState>()(
         });
       },
 
+      // removes a csv graph widget from the project
       removeCsvGraph: (id: string) => {
         const current_project = get().current_project;
         const updatedGraphs = get().csvGraphs.filter(
@@ -505,6 +529,7 @@ export const useProjectStore = create<ProjectState>()(
         }
       },
 
+      // updates graph data by fetching from rust backend
       updateGraphData: async (id, xCol, yCol, path, context) => {
         console.log(
           `[DEBUG - STORE] updateGraphData Called -> id: ${id}, xCol: ${xCol}, yCol: ${yCol}, context: ${context}, path: ${path}`,
@@ -588,16 +613,19 @@ export const useProjectStore = create<ProjectState>()(
         }
       },
 
+      // updates map widget configuration
       setMapConfig: (mapCfg: Partial<MapConfig>) => {
         set({ telemetryMapConfig: { ...get().telemetryMapConfig, ...mapCfg } });
       },
 
+      // updates orientation widget configuration
       setQuatConfig: (quatCfg: Partial<QuaternionConfig>) => {
         set({
           telemetryQuatConfig: { ...get().telemetryQuatConfig, ...quatCfg },
         });
       },
 
+      // connects to hardware via serial port and starts telemetry stream
       connectToHardware: async (port: string, baud: number) => {
         set({
           telemetryGraphs: get().telemetryGraphs.map((g) => ({
@@ -744,6 +772,7 @@ export const useProjectStore = create<ProjectState>()(
           });
         }
       },
+      // disconnects from hardware and stops telemetry stream
       disconnectHardware: async () => {
         try {
           await invoke("stop_telemetry_stream");

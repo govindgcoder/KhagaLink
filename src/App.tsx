@@ -4,6 +4,7 @@ import Home from "./components/home";
 import ProjectDashboard from "./components/projectDashboard";
 import LoadingOverlay from "./components/LoadingOverlay";
 
+// main app component - manages view routing between home and project
 function App() {
   const current_view = useProjectStore((state) => state.current_view);
   const [showLoading, setShowLoading] = useState(false);

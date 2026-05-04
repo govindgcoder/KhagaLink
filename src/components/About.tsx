@@ -2,6 +2,7 @@ type AboutProps = {
   onBack: () => void;
 };
 
+// about page - displays app info and features
 export default function About({ onBack }: AboutProps) {
   return (
     <div className="w-full">

@@ -6,6 +6,7 @@ interface ProjectCreatorProps {
   onClose: () => void;
 }
 
+// project creator dialog - creates new projects
 export default function ProjectCreator({ onClose }: ProjectCreatorProps) {
   const [name, setName] = useState("");
   const [path, setPath] = useState("");

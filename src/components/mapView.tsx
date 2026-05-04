@@ -25,6 +25,7 @@ interface MapWidgetProps {
   ) => void;
 }
 
+// map widget - displays live position on openstreetmap
 export function MapWidget({ headers, onConfigChange }: MapWidgetProps) {
   const position = useProjectStore((s) => s.latestPosition);
 

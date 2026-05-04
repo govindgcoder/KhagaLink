@@ -10,6 +10,7 @@ export function setIsRunning() {
   isRunning = false;
 }
 
+// telemetry dashboard - live serial data visualization
 export default function Telemetry() {
   const [port, setPort] = useState("");
   const [baudRate, setBaudRate] = useState(9600);

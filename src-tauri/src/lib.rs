@@ -1,4 +1,5 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
+// tauri app entry point - initializes and runs the application
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
         tauri::Builder::default()
@@ -14,6 +15,7 @@ pub fn run() {
 
 use serde::{Deserialize, Serialize};
 
+// graph data structure for project serialization
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct GraphData {
     pub id: String,
@@ -23,6 +25,7 @@ pub struct GraphData {
     pub csv_path: String,
 }
 
+// project structure - main data model
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Project {
     pub name: String,
@@ -31,6 +34,7 @@ pub struct Project {
     pub csv_files: Vec<CsvFileConfig>,
     pub csv_graphs: Vec<GraphData>,
 }
+// csv file configuration for project
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct CsvFileConfig {
     pub path: String,
@@ -41,6 +45,7 @@ use std::path::Path;
 use std::fs;
 use chrono::Local;
 
+// creates a new project with project.json file
 #[tauri::command]
 fn create_project(path: String, name: String) -> Result<String, String> {
     let local_date = Local::now().date_naive().format("%d-%m-%Y");
@@ -64,13 +69,14 @@ fn create_project(path: String, name: String) -> Result<String, String> {
 
 use std::error::Error;
 
+// csv metadata response structure
 #[derive(Debug, Serialize)]
 pub struct CSVmetadata {
     pub headers: Vec<String>,
     pub total_rows: usize,
 }
 
-//reads files, get the headers, count rows
+// reads csv file and extracts headers and row count
 fn read_metadata(path:&str)->Result<CSVmetadata, Box<dyn Error>>{
     let mut rdr = csv::ReaderBuilder::new().flexible(true).from_path(path)?;
 
@@ -92,6 +98,7 @@ struct GraphPoint {
 }
 
 
+// retrieves graph data points from csv for charting
 #[tauri::command]
 fn get_graph_data(path: String, x_col: usize, y_col: usize, max_points: usize) -> Result<Vec<GraphPoint>, String> {
     let mut rdr = csv::ReaderBuilder::new()
@@ -127,6 +134,7 @@ fn get_graph_data(path: String, x_col: usize, y_col: usize, max_points: usize) -
     Ok(points)
 }
 
+// returns csv headers and total row count
 #[tauri::command]
 fn get_csv_metadata(path:String)->Result<CSVmetadata, String>{
     match read_metadata(&path){
@@ -135,7 +143,7 @@ fn get_csv_metadata(path:String)->Result<CSVmetadata, String>{
     }
 }
 
-// to get a window of csv rows
+// reads a window of rows from csv for pagination
 fn read_csv_rows(path:&str, start_index:usize, window_size:usize)->Result<Vec<Vec<String>>, String>{
     let mut rdr = csv::ReaderBuilder::new().flexible(true).from_path(path).map_err(|e| e.to_string())?;
 	let mut rows: Vec<Vec<String>> = Vec::new();
@@ -150,7 +158,7 @@ fn read_csv_rows(path:&str, start_index:usize, window_size:usize)->Result<Vec<Ve
 	}
 	Ok(rows)
 }
-//the bridge
+// returns a window of csv rows for display
 #[tauri::command]
 fn get_csv_rows(path:String, start_index:usize, window_size:usize)->Result<Vec<Vec<String>>,String>{
 	match read_csv_rows(&path, start_index, window_size){
@@ -159,6 +167,7 @@ fn get_csv_rows(path:String, start_index:usize, window_size:usize)->Result<Vec<V
 	}
 }
 
+// loads project.json and deserializes to Project struct
 #[tauri::command]
 fn load_project(path: String)-> Result<Project, String>{
 	let json_data = fs::read_to_string(path).map_err(|e| e.to_string())?;
@@ -166,6 +175,7 @@ fn load_project(path: String)-> Result<Project, String>{
     Ok(project_data)
 }
 
+// serializes and saves project to project.json
 #[tauri::command]
 fn save_project(project: Project)-> Result<(), String>{
 	let json_data = serde_json::to_string(&project).map_err(|e| e.to_string())?;
@@ -186,7 +196,7 @@ fn check_path_exists(path: String)-> bool {
 	Path::new(&path).exists()
 }
 
-// for rust serial
+// for rust serial - telemetry system
 use std::time::Duration;
 use std::thread;
 use std::io::Read;
@@ -218,9 +228,9 @@ fn start_telemetry_stream(
 
     let is_running_clone = Arc::clone(&state.is_running);
 
-    thread::spawn(move || {
-        state.is_running.store(true, Ordering::Relaxed);
+    state.is_running.store(true, Ordering::Relaxed);
 
+    thread::spawn(move || {
         let mut serial_buf: Vec<u8> = vec![0; 1024];
         let mut packet_buffer = String::new();
 

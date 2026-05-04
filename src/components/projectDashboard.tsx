@@ -4,6 +4,7 @@ import Telemetry, { isRunning, setIsRunning } from "./telemetry";
 import LoadingOverlay from "./LoadingOverlay";
 import { useProjectStore } from "../stores/useStore";
 
+// main project dashboard - manages csv/telemetry tabs
 export default function ProjectDashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 

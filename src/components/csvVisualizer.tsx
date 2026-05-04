@@ -3,6 +3,7 @@ import { useProjectStore } from "../stores/useStore";
 import { open } from "@tauri-apps/plugin-dialog";
 import GraphWidgetComponent from "./GraphWidgetComponent";
 
+// csv visualizer - displays csv table and graphs
 export default function CsvVisualizer() {
   const [path, setPath] = useState("");
   const [offset, setOffset] = useState(0);

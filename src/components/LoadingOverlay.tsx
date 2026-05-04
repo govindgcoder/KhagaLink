@@ -6,6 +6,7 @@ type LoadingOverlayProps = {
   duration?: number;
 };
 
+// loading overlay - displays animated loading text
 export default function LoadingOverlay({ text, onComplete, duration = 800 }: LoadingOverlayProps) {
   const [displayText, setDisplayText] = useState("");
 

@@ -16,6 +16,7 @@ const normalizePath = (p: string) =>
     .replace(/\/+$/, "")
     .replace(/\/project\.json$/, "");
 
+// home view - project list and navigation
 export default function Home({ onNavigate }: HomeProps) {
   const [isNewProject, setIsNewProject] = useState(false);
   const [isLoadProject, setIsLoadProject] = useState(false);

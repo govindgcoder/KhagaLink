@@ -17,6 +17,7 @@ interface GraphWidgetProps {
   context: string;
 }
 
+// graph widget component - renders line chart with column selectors
 function GraphWidgetComponent({
   widget,
   headers,

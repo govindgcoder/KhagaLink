@@ -12,6 +12,7 @@ interface ProjectLoaderProps {
   onClose: () => void;
 }
 
+// project loader dialog - loads existing projects
 export default function ProjectLoader({ onClose }: ProjectLoaderProps) {
   const [path, setPath] = useState("");
 

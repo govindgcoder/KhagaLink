@@ -33,6 +33,7 @@ const themes = {
   },
 };
 
+// settings page - theme configuration
 export default function Settings({ onBack }: SettingsProps) {
   const [activeTheme, setActiveTheme] = useState("default");
 

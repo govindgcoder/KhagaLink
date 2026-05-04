@@ -39,6 +39,7 @@ function OrientationCone({ quaternion }: OrientationConeProps) {
   );
 }
 
+// orientation widget - displays 3d orientation from quaternion
 export function OrientationWidget({
   wCol,
   xCol,
