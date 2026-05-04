@@ -1,174 +1,102 @@
 <div align="center">
 
-# 🚀💻 KhagaLink
+# KhagaLink
 
-![Version](https://img.shields.io/badge/version-1.0.0-violet) 
-![Stack](https://img.shields.io/badge/tech-React_|_Tauri_|_Rust-red) 
+![Version](https://img.shields.io/badge/version-1.0.1-violet)
+![Stack](https://img.shields.io/badge/tech-React_|_Tauri_|_Rust-red)
 ![License](https://img.shields.io/badge/license-MIT-green)
-<a href="https://github.com/govindgcoder/KhagaLink/stargazers"><img src="https://img.shields.io/github/stars/govindgcoder/KhagaLink?style=social" alt="Stars" /></a>
+<a href="https://github.com/govindgcoder/KhagaLink/stargazers">
+  <img src="https://img.shields.io/github/stars/govindgcoder/KhagaLink?style=social" alt="Stars" />
+</a>
 
 <br/>
 
-<img width="800" alt="KhagaLink Main Interface" src="https://github.com/user-attachments/assets/a318b053-edc1-434c-b1c4-ee805092676f" />
+<img width="800" alt="image" src="https://github.com/user-attachments/assets/47b35aaf-5d3e-4e45-908f-958d50d0419e" />
 
 <br/>
 
-**Rust-powered desktop telemetry dashboard for model rocketry missions.**
-
-KhagaLink is a Ground Control Station (GCS) bridging raw flight logs and actionable insights. It combines a React frontend for visualization with a native Rust backend for low-latency serial communication, built specifically for ESP32 and STM32 flight computers.
-
-<br/>
-
-> ### ❤️ Show Your Support
-> *Maintained by a solo developer. If this tool saves you an hour of wrestling with Python scripts or stops your laptop from crashing over a massive CSV, consider dropping a ⭐ on the repo! It is the absolute best way to keep this project alive and updated.*
-
+**A fast telemetry dashboard and CSV visualizer for embedded systems.**
 </div>
+Built for ESP32, STM32, and custom hardware, KhagaLink pairs a React frontend with a Rust backend for smooth serial communication, live telemetry, and large CSV analysis without UI lag.
 
-***
 
-### 📸 Screenshots
+<br/>
+
+<br/>
+
+> Maintained by a solo developer. If KhagaLink saves you time or replaces a pile of scripts, a ⭐ helps a lot.
+
+
+---
+
+### Quick Start
+
+1. Open the [Releases](https://github.com/govindgcoder/KhagaLink/releases) page.
+2. Download the latest `.exe` on Windows.
+3. Connect your device and start streaming.
+
+Otherwise, build it yourself!
+
+---
+
+### Screenshots
+<br/>
+<br/>
+
 <div align="center">
-  <img width="800" alt="KhagaLink View 2" src="https://github.com/user-attachments/assets/c9f3af4f-735f-4ad3-b53e-fcc7a9b2d14f" />
+  <img width="800" alt="image" src="https://github.com/user-attachments/assets/06d5d05f-b36c-490e-abc8-6e028756e3c6" />
+
   <br/><br/>
-  <img width="800" alt="KhagaLink View 3" src="https://github.com/user-attachments/assets/695f4855-fe24-41f0-8e4e-9cd5ec27ed65" />
+  <img width="800" alt="image" src="https://github.com/user-attachments/assets/0942b800-5eae-4d4c-b646-708ce8797978" />
+<br/><br/>
+  <img width="800" alt="image" src="https://github.com/user-attachments/assets/11b8b5fe-8841-44b7-8698-33e21322cc81" />
+
 </div>
 
-***
+---
 
-### 🎯 Why a native desktop app?
-* Web-based tools lack reliable, low-level serial port access.
-* Native Rust backends ensure zero-latency data processing during live field operations.
-* Offline-first architecture guarantees functionality on launch days without internet access.
+### Why it exists
 
-***
+Web tools are fine until the serial stream gets noisy.
 
-### ✨ Features (v1.0.0)
+KhagaLink stays responsive by moving parsing and heavy lifting into Rust, with an offline-first desktop workflow that holds up in the lab, field, or launchpad.
 
-**Project Management**
-* Create new projects with custom naming and local folder storage.
-* Load existing projects via native OS file dialogs.
-* Delete projects via right-click context menus.
-* Persistent storage utilizing `localStorage` for UI state and `project.json` for metadata.
+---
 
-**Real-Time Telemetry**
-* Direct COM port serial connection (e.g., COM5).
-* Configurable baud rates: 9600, 19200, 38400, 57600, 115200, 230400.
-* Live streaming of newline-delimited packets.
-* Native comma-separated value (CSV) packet parsing.
+### Features
 
-**Telemetry Dashboard Widgets**
-* **Live Graphs:** Real-time line charts with configurable data columns and smart auto-panning.
-* **GPS Map:** Leaflet integration displaying lat/lng position based on selected packet indices.
-* **3D Orientation:** Three.js quaternion visualization mapping W/X/Y/Z columns to a 3D model.
-* **Data Rate:** Real-time metrics for packets per second (Hz) and packet loss percentage.
+- Serial connection over COM ports with configurable baud rates
+- Live telemetry streaming from newline-delimited packets
+- Real-time graphing with auto-panning
+- GPS map view for latitude and longitude data
+- 3D quaternion visualization with Three.js
+- CSV loading, pagination, and column detection
+- Smart downsampling for large datasets
 
-**CSV Analysis**
-* Native dialog browser for CSV file selection.
-* Paginated table view (50 rows/page) with automatic header detection.
-* Column intelligence displaying total rows and column counts.
-* Interactive line graphs supporting any X/Y column combination.
-* Smart data downsampling (max 2000 points) to maintain render performance.
+---
 
-***
+### Tech Stack
 
-### 🛠️ Tech Stack
+Tauri + React Stack
+- Frontend: React, TS, Vite, Tailwind
+- Desktop: Tauri (Rust)
+- State/UI: Zustand, Recharts, Leaflet, Three.js
+- Data/IO: Rust (serialport, csv)
+  
+---
 
-| Layer | Technology |
-| :--- | :--- |
-| **Frontend** | React 19, TypeScript |
-| **Desktop Core** | Tauri 2 (Rust) |
-| **State Management** | Zustand 5 (with persistence) |
-| **Build Tool** | Vite 7 |
-| **Styling** | Tailwind CSS 4 |
-| **Charts** | Recharts |
-| **Maps** | Leaflet + react-leaflet |
-| **3D Rendering** | Three.js + @react-three/fiber |
-| **Hardware IO** | Rust `serialport` crate |
-| **Data Parsing** | Rust `csv` crate |
+### Getting Started
 
-***
-
-### 🏗️ Architecture
-
-**Frontend (React)**
-Handles all UI components, 3D rendering, and chart updates. Communicates with Tauri via `invoke()` commands and listens to `telemetry-packet` events.
-
-**Tauri Core (Rust)**
-Manages file operations (`create_project`, `load_project`, `save_project`), heavy data parsing (`get_csv_metadata`, `get_graph_data`), and spawns dedicated background threads for uninterrupted serial port listening.
-
-***
-
-### 🚀 Getting Started
-
-**Prerequisites**
-* Node.js (LTS)
-* Rust & Cargo
-
-**Installation**
 ```bash
-# Clone the repository
-git clone [https://github.com/govindgcoder/KhagaLink.git](https://github.com/govindgcoder/KhagaLink.git)
+git clone https://github.com/govindgcoder/KhagaLink.git
 cd KhagaLink
-
-# Install dependencies
 npm install
-
-# Run development server
 npm run tauri dev
-```
 
-**Build for Production**
-```bash
+Build for production:
+
 npm run tauri build
 ```
-*Output binaries (.exe for Windows, .app for macOS) will be generated in `src-tauri/target/release/`.*
+### License
 
-***
-
-### 📖 Usage Guide
-
-1. **Create a Project:** Click "Create a new Project", select a local folder, and assign a name.
-2. **Load Flight Data (CSV):** Open your project, click the "+" icon to browse, and select your flight log.
-3. **Analyze Data:** Use the paginated table to inspect raw values. Add Graph Widgets and select your X/Y columns to visualize trends.
-4. **Connect to Flight Hardware:** Navigate to the Telemetry tab, click "Configure Connection", enter your COM port and Baud Rate, and connect.
-5. **Monitor Live Data:** Add live graphs, map your GPS columns, and assign quaternion data to watch the 3D orientation model track your hardware in real time.
-
-***
-
-### 📁 File Structure
-
-```text
-KhagaLink/
-├── src/
-│   ├── components/
-│   │   ├── home.tsx                 # Project list & creation
-│   │   ├── projectDashboard.tsx     # Main dashboard shell
-│   │   ├── csvVisualizer.tsx        # CSV table + static graphs
-│   │   ├── telemetry.tsx            # Live telemetry dashboard
-│   │   ├── GraphWidgetComponent.tsx # Shared charting logic
-│   │   ├── mapView.tsx              # Leaflet GPS integration
-│   │   ├── orientationWidget.tsx    # Three.js quaternion viz
-│   │   ├── DataRateWidget.tsx       # Link statistics
-│   │   ├── projectCreator.tsx
-│   │   └── projectLoader.tsx
-│   ├── stores/
-│   │   └── useStore.ts              # Zustand state & Rust bridge
-│   ├── App.tsx
-│   ├── main.tsx
-│   └── index.css
-├── src-tauri/
-│   ├── src/
-│   │   ├── lib.rs                   # Tauri commands & Serial threads
-│   │   └── main.rs
-│   ├── Cargo.toml
-│   └── tauri.conf.json
-├── package.json
-└── vite.config.ts
-```
-
-***
-
-### 📜 License & Credits
-MIT License. 
-
-Built for the **VeloCET Payload Team** at [velo.cet.ac.in](http://velo.cet.ac.in).
+MIT License.
