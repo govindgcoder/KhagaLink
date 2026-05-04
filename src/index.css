@@ -58,10 +58,6 @@ select {
     background-color: var(--secondary-color);
 }
 
-button {
-    background-color: var(--accent-color);
-}
-
 p {
     color: var(--text-primary);
 }

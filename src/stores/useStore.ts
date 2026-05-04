@@ -807,9 +807,7 @@ export const useProjectStore = create<ProjectState>()(
     {
       name: "project-store",
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({
-        current_project: state.current_project,
-      }),
+      partialize: () => ({}),
     },
   ),
 );
