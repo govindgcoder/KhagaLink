@@ -100,3 +100,5 @@ npm run tauri build
 ### License
 
 MIT License.
+
+> originally built as the payload lead at the college rocketry club, VeloCET
