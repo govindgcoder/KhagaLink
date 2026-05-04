@@ -55,7 +55,11 @@ fieldset {
 }
 
 select {
-    background-color: var(--tertiary-color);
+    background-color: var(--secondary-color);
+}
+
+button {
+    background-color: var(--accent-color);
 }
 
 p {

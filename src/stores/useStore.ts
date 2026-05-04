@@ -326,14 +326,18 @@ export const useProjectStore = create<ProjectState>()(
           });
 
           const csvGraphConfigs = project.csv_graphs || [];
-          
+
           const validCsvFiles = await Promise.all(
             (project.csv_files || []).map(async (csv) => {
-              const exists = await invoke<boolean>("check_path_exists", { path: csv.path });
+              const exists = await invoke<boolean>("check_path_exists", {
+                path: csv.path,
+              });
               return exists ? csv : null;
-            })
+            }),
           );
-          const filteredCsvFiles = validCsvFiles.filter(Boolean) as CsvFileConfig[];
+          const filteredCsvFiles = validCsvFiles.filter(
+            Boolean,
+          ) as CsvFileConfig[];
 
           const loadedCsvGraphs: GraphWidget[] = csvGraphConfigs.map(
             (g: GraphWidgetConfig) => ({
@@ -366,7 +370,13 @@ export const useProjectStore = create<ProjectState>()(
 
           for (const graph of loadedCsvGraphs) {
             if (graph.csv_path) {
-              get().updateGraphData(graph.id, graph.x_col_idx, graph.y_col_idx, graph.csv_path, "csv");
+              get().updateGraphData(
+                graph.id,
+                graph.x_col_idx,
+                graph.y_col_idx,
+                graph.csv_path,
+                "csv",
+              );
             }
           }
           return true;
@@ -707,9 +717,12 @@ export const useProjectStore = create<ProjectState>()(
                 );
 
                 // Return a brand new state object
-                return { 
+                return {
                   telemetryGraphs: updatedGraphs,
-                  telemetryDataLog: [...state.telemetryDataLog, stringVals].slice(-10000),
+                  telemetryDataLog: [
+                    ...state.telemetryDataLog,
+                    stringVals,
+                  ].slice(-10000),
                 };
               });
             },
@@ -739,7 +752,7 @@ export const useProjectStore = create<ProjectState>()(
             unlistenTelemetry();
             unlistenTelemetry = null;
           }
-set({
+          set({
             telemetryHeaders: [],
             telemetryDataLog: [],
             telemetryGraphs: get().telemetryGraphs.map((g) => ({
@@ -765,7 +778,9 @@ set({
     {
       name: "project-store",
       storage: createJSONStorage(() => localStorage),
-      partialize: () => ({}),
+      partialize: (state) => ({
+        current_project: state.current_project,
+      }),
     },
   ),
 );

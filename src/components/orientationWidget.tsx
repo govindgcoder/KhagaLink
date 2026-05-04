@@ -1,6 +1,4 @@
 import { Canvas } from "@react-three/fiber";
-import { useEffect, useRef } from "react";
-import * as THREE from "three";
 import { useProjectStore } from "../stores/useStore";
 
 interface OrientationWidgetProps {
@@ -50,8 +48,7 @@ export function OrientationWidget({
   onConfigChange,
 }: OrientationWidgetProps) {
   const quat = useProjectStore((s) => s.latestQuaternion);
-  const quatConfig = useProjectStore((s) => s.telemetryQuatConfig);
-  quatConfig.enabled = true;
+  useProjectStore.getState().setQuatConfig({ enabled: true });
 
   return (
     <div className="flex flex-col gap-2 my-2.5 p-4 border-[var(--border-color)] bg-[var(--secondary-color)] rounded-2xl">

@@ -214,11 +214,13 @@ fn start_telemetry_stream(
         .open()
         .map_err(|e| format!("Access Denied: Is the port open in another app? ({})", e))?;
 
-    state.is_running.store(true, Ordering::Relaxed);
+
 
     let is_running_clone = Arc::clone(&state.is_running);
 
     thread::spawn(move || {
+        state.is_running.store(true, Ordering::Relaxed);
+
         let mut serial_buf: Vec<u8> = vec![0; 1024];
         let mut packet_buffer = String::new();
 
