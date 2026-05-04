@@ -100,5 +100,5 @@ npm run tauri build
 ### License
 
 MIT License.
-
+> note: in the telemetry csv, first column serves as index sequence (for data rate) and second as timestamp in seconds
 > originally built as the payload lead at the college rocketry club, VeloCET
