@@ -5,6 +5,11 @@ import { MapWidget } from "./mapView";
 import { OrientationWidget } from "./orientationWidget";
 import { DataRateWidget } from "./DataRateWidget";
 
+export var isRunning: boolean = false;
+export function setIsRunning() {
+  isRunning = false;
+}
+
 export default function Telemetry() {
   const [port, setPort] = useState("");
   const [baudRate, setBaudRate] = useState(9600);
@@ -20,6 +25,7 @@ export default function Telemetry() {
 
   const handleConnect = () => {
     connectToHardware(port, baudRate);
+    isRunning = true;
     closeModal();
   };
 

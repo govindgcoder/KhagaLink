@@ -20,7 +20,7 @@ interface OrientationWidgetProps {
   ) => void;
 }
 
-interface TrigonalPyramidProps {
+interface OrientationConeProps {
   quaternion: {
     w: number;
     x: number;
@@ -29,26 +29,14 @@ interface TrigonalPyramidProps {
   };
 }
 
-// pyramid mesh
-function TrigonalPyramid({ quaternion }: TrigonalPyramidProps) {
-  const meshRef = useRef<THREE.Mesh>(null);
-
-  // apply quaternion rotation
-  useEffect(() => {
-    if (!meshRef.current) return;
-
-    meshRef.current.quaternion.set(
-      quaternion.x,
-      quaternion.y,
-      quaternion.z,
-      quaternion.w,
-    );
-  }, [quaternion]);
-
+// cone mesh
+function OrientationCone({ quaternion }: OrientationConeProps) {
   return (
-    <mesh ref={meshRef}>
-      <tetrahedronGeometry args={[2, 0]} />
-      <meshStandardMaterial color="#7653fc" />
+    <mesh quaternion={[quaternion.x, quaternion.y, quaternion.z, quaternion.w]}>
+      {/* radius, height, radialSegments */}
+      <coneGeometry args={[0.75, 3, 8]} />
+      <meshStandardMaterial color="#7653fc" flatShading />
+      <axesHelper args={[3]} />
     </mesh>
   );
 }
@@ -68,7 +56,7 @@ export function OrientationWidget({
   return (
     <div className="flex flex-col gap-2 my-2.5 p-4 border-[var(--border-color)] bg-[var(--secondary-color)] rounded-2xl">
       {/* config selectors */}
-      <div className="flex flex-wrap gap-2 items-center text-xs bg-[--tertiary-color] justify-start">
+      <div className="flex flex-wrap justify-between items-center text-xs bg-[--tertiary-color] ">
         <select
           value={wCol}
           onChange={(e) => onConfigChange({ wCol: +e.target.value })}
@@ -118,7 +106,7 @@ export function OrientationWidget({
       <Canvas style={{ height: "200px" }} camera={{ position: [2, 2, 2] }}>
         <ambientLight intensity={1} />
         <directionalLight position={[5, 5, 5]} />
-        <TrigonalPyramid quaternion={quat} />
+        <OrientationCone quaternion={quat} />
       </Canvas>
     </div>
   );

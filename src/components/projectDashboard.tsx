@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import CsvVisualizer from "./csvVisualizer";
-import Telemetry from "./telemetry";
+import Telemetry, { isRunning, setIsRunning } from "./telemetry";
 import LoadingOverlay from "./LoadingOverlay";
 import { useProjectStore } from "../stores/useStore";
 
@@ -27,8 +27,16 @@ export default function ProjectDashboard() {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  const disconnectHardware = useProjectStore(
+    (state) => state.disconnectHardware,
+  );
+
   const handleExit = () => {
     loadView("Home");
+    if (isRunning) {
+      disconnectHardware();
+      setIsRunning();
+    }
   };
 
   const isTabActive = (tab: string) => selectedTab === tab;
@@ -36,6 +44,10 @@ export default function ProjectDashboard() {
   const handleTabChange = (tab: string) => {
     if (tab !== selectedTab) {
       setShowLoading(true);
+      if (selectedTab === "tele" && isRunning) {
+        disconnectHardware();
+        setIsRunning();
+      }
       setTimeout(() => {
         setSelectedTab(tab);
         setShowLoading(false);
