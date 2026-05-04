@@ -78,19 +78,7 @@ export default function CsvVisualizer() {
   }, [path]);
 
   return (
-    <div
-      className="p-8 flex flex-col gap-4 min-h-0 bg-[var(--background-color)] rounded-xl overflow-y-auto hide-scrollbar"
-      style={{
-        msOverflowStyle: "none", // IE and Edge
-        scrollbarWidth: "none", // Firefox
-      }}
-    >
-      <style>{`
-            .hide-scrollbar::-webkit-scrollbar {
-                display: none;
-            }
-          `}</style>
-
+    <div className="p-8 flex flex-col gap-4 min-h-0 bg-[var(--background-color)] rounded-xl overflow-y-auto">
       {/* CSV File Browser Widget */}
       <div className="flex flex-col p-4 border border-[var(--border-color)] bg-[var(--secondary-color)] rounded-xl gap-4">
         <div className="flex justify-between">

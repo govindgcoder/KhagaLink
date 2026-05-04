@@ -32,7 +32,7 @@ function OrientationCone({ quaternion }: OrientationConeProps) {
   return (
     <mesh quaternion={[quaternion.x, quaternion.y, quaternion.z, quaternion.w]}>
       {/* radius, height, radialSegments */}
-      <coneGeometry args={[0.75, 3, 8]} />
+      <coneGeometry args={[1, 2.5, 8]} />
       <meshStandardMaterial color="#7653fc" flatShading />
       <axesHelper args={[3]} />
     </mesh>

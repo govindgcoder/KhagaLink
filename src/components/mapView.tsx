@@ -49,7 +49,11 @@ export function MapWidget({ headers, onConfigChange }: MapWidgetProps) {
           ))}
         </select>
       </div>
-      <MapContainer center={[0, 0]} zoom={13} style={{ height: "250px" }}>
+      <MapContainer
+        center={[0, 0]}
+        zoom={13}
+        style={{ height: "250px", borderRadius: "12px", overflow: "hidden" }}
+      >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         {position && (
           <>
