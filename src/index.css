@@ -2,12 +2,12 @@
 
 @font-face {
     font-family: "Urbanist";
-    src: url("./src/assets/Urbanist.ttf") format("truetype");
+    src: url("/assets/Urbanist.ttf") format("truetype");
 }
 
 @font-face {
     font-family: "Urbanist Italic";
-    src: url("./src/assets/Urbanist-Italic.ttf") format("truetype");
+    src: url("/assets/Urbanist-Italic.ttf") format("truetype");
 }
 
 .italic-text {
