@@ -4,7 +4,8 @@ import ProjectLoader from "./projectLoader";
 import ProjectCreator from "./projectCreator";
 import Settings from "./Settings";
 import About from "./About";
-import { useGlobalStore, useProjectStore } from "../stores/useStore";
+import { useGlobalStore } from "../stores/projectStore";
+import { useProjectStore } from "../stores/projectStore";
 
 type HomeProps = {
   onNavigate?: (view: string) => void;
@@ -23,7 +24,6 @@ export default function Home({ onNavigate }: HomeProps) {
   const [showSettings, setShowSettings] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
 
-  const [path, setPath] = useState("");
   const [menu, setMenu] = useState({ visible: false, x: 0, y: 0 });
 
   const projectList = useGlobalStore((state) => state.projects);
@@ -78,7 +78,6 @@ export default function Home({ onNavigate }: HomeProps) {
   const handleDeleteProject = (path: string) => {
     deleteProject(path);
     alert("project deleted");
-    setPath("");
     useGlobalStore
       .getState()
       .validateProjectPaths(useGlobalStore.getState().projects);

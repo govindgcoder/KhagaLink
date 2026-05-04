@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useProjectStore } from "./stores/useStore";
+import { useProjectStore } from "./stores/projectStore";
 import Home from "./components/home";
 import ProjectDashboard from "./components/projectDashboard";
 import LoadingOverlay from "./components/LoadingOverlay";

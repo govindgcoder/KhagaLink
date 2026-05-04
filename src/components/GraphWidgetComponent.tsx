@@ -1,4 +1,6 @@
-import { useProjectStore, GraphWidget } from "../stores/useStore";
+import { useProjectStore } from "../stores/projectStore";
+import { useTelemetryStore } from "../stores/telemetryStore";
+import type { GraphWidget } from "../stores/types";
 import React from "react";
 import {
   LineChart,
@@ -25,43 +27,35 @@ function GraphWidgetComponent({
   context,
 }: GraphWidgetProps) {
   const updateGraphData = useProjectStore((state) => state.updateGraphData);
-  const removeGraphWidget = useProjectStore((state) =>
-    context === "csv" ? state.removeCsvGraph : state.removeTelemetryGraph,
+  const updateTelemetryGraphData = useTelemetryStore(
+    (state) => state.updateTelemetryGraphData,
   );
-
-  console.log(
-    `[DEBUG - WIDGET] RENDER -> ID: ${widget.id} | Data Length: ${widget.data.length}`,
+  const removeCsvGraph = useProjectStore((state) => state.removeCsvGraph);
+  const removeTelemetryGraph = useTelemetryStore(
+    (state) => state.removeTelemetryGraph,
   );
 
   const handleAxisChange = (axis: "x" | "y", newIndex: number) => {
-    console.log(
-      `[DEBUG - WIDGET] Dropdown Changed -> Axis: ${axis}, New Index: ${newIndex}`,
-    );
     if (!currentCsvPath) {
-      console.log(
-        `[DEBUG - WIDGET] Aborting Axis Change - No CSV Path provided.`,
-      );
       return;
     }
 
     const newX = axis === "x" ? newIndex : widget.x_col_idx;
     const newY = axis === "y" ? newIndex : widget.y_col_idx;
 
-    updateGraphData(widget.id, newX, newY, currentCsvPath, context);
+    if (context === "telemetry") {
+      updateTelemetryGraphData(widget.id, newX, newY);
+    } else if (currentCsvPath && currentCsvPath !== "LIVE") {
+      updateGraphData(widget.id, newX, newY, currentCsvPath, context);
+    }
   };
 
   useEffect(() => {
-    console.log(
-      `[DEBUG - WIDGET] useEffect Fired -> Path: ${currentCsvPath}, Data Length: ${widget.data.length}`,
-    );
     if (
       currentCsvPath &&
       currentCsvPath !== "LIVE" &&
       widget.data.length === 0
     ) {
-      console.log(
-        `[DEBUG - WIDGET] useEffect is triggering updateGraphData...`,
-      );
       updateGraphData(
         widget.id,
         widget.x_col_idx,
@@ -152,7 +146,11 @@ function GraphWidgetComponent({
             Export SVG
           </button>
           <button
-            onClick={() => removeGraphWidget(widget.id)}
+            onClick={() =>
+              context === "csv"
+                ? removeCsvGraph(widget.id)
+                : removeTelemetryGraph(widget.id)
+            }
             className="text-red-400 hover:bg-red-500/20 text-xs px-3 py-1 rounded transition-colors"
           >
             Remove

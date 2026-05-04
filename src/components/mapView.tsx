@@ -2,7 +2,7 @@ import L from "leaflet";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 L.Icon.Default.mergeOptions({ iconUrl: markerIcon, shadowUrl: markerShadow });
-import { useProjectStore } from "../stores/useStore";
+import { useTelemetryStore } from "../stores/telemetryStore";
 import { useEffect } from "react";
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
@@ -27,7 +27,7 @@ interface MapWidgetProps {
 
 // map widget - displays live position on openstreetmap
 export function MapWidget({ headers, onConfigChange }: MapWidgetProps) {
-  const position = useProjectStore((s) => s.latestPosition);
+  const position = useTelemetryStore((s) => s.latestPosition);
 
   return (
     <div className="flex flex-col gap-2 h-56 border p-4 border-[var(--border-color)] bg-[var(--secondary-color)] rounded-2xl">

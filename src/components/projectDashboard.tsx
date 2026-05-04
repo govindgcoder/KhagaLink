@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import CsvVisualizer from "./csvVisualizer";
 import Telemetry from "./telemetry";
 import LoadingOverlay from "./LoadingOverlay";
-import { useProjectStore } from "../stores/useStore";
+import { useProjectStore } from "../stores/projectStore";
+import { useTelemetryStore } from "../stores/telemetryStore";
 
 // main project dashboard - manages csv/telemetry tabs
 export default function ProjectDashboard() {
@@ -13,6 +14,8 @@ export default function ProjectDashboard() {
 
   const [selectedTab, setSelectedTab] = useState("csv");
   const [showLoading, setShowLoading] = useState(false);
+
+  const isConnected = useTelemetryStore((s) => s.isConnected);
 
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
@@ -28,7 +31,11 @@ export default function ProjectDashboard() {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  const handleExit = () => {
+  const handleExit = async () => {
+    const store = useTelemetryStore.getState();
+    if (store.isConnected) {
+      await store.disconnectHardware();
+    }
     loadView("Home");
   };
 
@@ -36,6 +43,12 @@ export default function ProjectDashboard() {
 
   const handleTabChange = (tab: string) => {
     if (tab !== selectedTab) {
+      if (isConnected) {
+        alert(
+          "Cannot switch while telemetry connection is Active. Please Disconnect first!",
+        );
+        return;
+      }
       setShowLoading(true);
       setTimeout(() => {
         setSelectedTab(tab);
@@ -43,6 +56,15 @@ export default function ProjectDashboard() {
       }, 800);
     }
   };
+
+  useEffect(() => {
+    return () => {
+      const store = useTelemetryStore.getState();
+      if (store.isConnected) {
+        store.disconnectHardware();
+      }
+    };
+  }, []);
 
   return showLoading ? (
     <LoadingOverlay text="Loading..." />

@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { useProjectStore } from "../stores/useStore";
+import { useTelemetryStore } from "../stores/telemetryStore";
 import GraphWidgetComponent from "./GraphWidgetComponent";
 import { MapWidget } from "./mapView";
 import { OrientationWidget } from "./orientationWidget";
@@ -11,7 +11,7 @@ export default function Telemetry() {
 
   const dialogRef = useRef<HTMLDialogElement | null>(null);
 
-  const connectToHardware = useProjectStore((state) => state.connectToHardware);
+  const connectToHardware = useTelemetryStore((state) => state.connectToHardware);
 
   const openModal = () => dialogRef.current?.showModal();
 
@@ -23,20 +23,20 @@ export default function Telemetry() {
     closeModal();
   };
 
-  const activeGraphs = useProjectStore((state) => state.telemetryGraphs);
+  const activeGraphs = useTelemetryStore((state) => state.telemetryGraphs);
 
-  const addGraphWidget = useProjectStore((state) => state.addTelemetryGraph);
+  const addGraphWidget = useTelemetryStore((state) => state.addTelemetryGraph);
 
-  const telemetryHeaders = useProjectStore((state) => state.telemetryHeaders);
-  const telemetryMapConfig = useProjectStore(
+  const telemetryHeaders = useTelemetryStore((state) => state.telemetryHeaders);
+  const telemetryMapConfig = useTelemetryStore(
     (state) => state.telemetryMapConfig,
   );
-  const setMapConfig = useProjectStore((state) => state.setMapConfig);
+  const setMapConfig = useTelemetryStore((state) => state.setMapConfig);
 
-  const telemetryQuatConfig = useProjectStore((s) => s.telemetryQuatConfig);
-  const setQuatConfig = useProjectStore((s) => s.setQuatConfig);
+  const telemetryQuatConfig = useTelemetryStore((s) => s.telemetryQuatConfig);
+  const setQuatConfig = useTelemetryStore((s) => s.setQuatConfig);
 
-  const disconnectHardware = useProjectStore(
+  const disconnectHardware = useTelemetryStore(
     (state) => state.disconnectHardware,
   );
   const handleDisconnect = () => {

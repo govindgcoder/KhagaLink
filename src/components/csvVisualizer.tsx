@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useProjectStore } from "../stores/useStore";
+import { useProjectStore } from "../stores/projectStore";
 import { open } from "@tauri-apps/plugin-dialog";
 import GraphWidgetComponent from "./GraphWidgetComponent";
 
@@ -214,7 +214,7 @@ export default function CsvVisualizer() {
             Graphs
           </h2>
           <button
-            onClick={addGraphWidget}
+            onClick={() => addGraphWidget()}
             className="bg-[var(--accent-color)] hover:bg-[var(--accent-muted)] text-[var(--text-primary)] text-xs px-4 py-1.5 rounded-lg font-medium transition-all shadow-sm"
           >
             + Add Graph

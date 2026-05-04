@@ -1,11 +1,11 @@
-import { useProjectStore } from "../stores/useStore";
+import { useTelemetryStore } from "../stores/telemetryStore";
 
 // data rate widget - shows packet rate and loss statistics
 export function DataRateWidget() {
-  const dataRate = useProjectStore((s) => s.dataRate);
-  const lossRate = useProjectStore((s) => s.lossRate);
-  const telemetryDataLog = useProjectStore((s) => s.telemetryDataLog);
-  const telemetryHeaders = useProjectStore((s) => s.telemetryHeaders);
+  const dataRate = useTelemetryStore((s) => s.dataRate);
+  const lossRate = useTelemetryStore((s) => s.lossRate);
+  const telemetryDataLog = useTelemetryStore((s) => s.telemetryDataLog);
+  const telemetryHeaders = useTelemetryStore((s) => s.telemetryHeaders);
 
 const handleExportCSV = () => {
     if (telemetryDataLog.length === 0) {

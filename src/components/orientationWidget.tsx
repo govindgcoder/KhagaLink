@@ -1,5 +1,5 @@
 import { Canvas } from "@react-three/fiber";
-import { useProjectStore } from "../stores/useStore";
+import { useTelemetryStore } from "../stores/telemetryStore";
 
 interface OrientationWidgetProps {
   wCol: number;
@@ -47,8 +47,8 @@ export function OrientationWidget({
   headers,
   onConfigChange,
 }: OrientationWidgetProps) {
-  const quat = useProjectStore((s) => s.latestQuaternion);
-  const quatConfig = useProjectStore((s) => s.telemetryQuatConfig);
+  const quat = useTelemetryStore((s) => s.latestQuaternion);
+  const quatConfig = useTelemetryStore((s) => s.telemetryQuatConfig);
   quatConfig.enabled = true;
 
   return (

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useProjectStore } from "../stores/useStore";
+import { useProjectStore } from "../stores/projectStore";
 import { open } from "@tauri-apps/plugin-dialog";
 
 interface ProjectCreatorProps {
