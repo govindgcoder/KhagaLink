@@ -8,6 +8,7 @@ pub fn run() {
         })
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_store::Builder::new().build())
         .invoke_handler(tauri::generate_handler![create_project, get_csv_metadata, get_csv_rows, load_project, save_project, delete_project, check_path_exists, get_graph_data, start_telemetry_stream, stop_telemetry_stream])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
