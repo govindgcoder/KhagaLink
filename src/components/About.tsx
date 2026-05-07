@@ -62,7 +62,7 @@ export default function About({ onBack }: AboutProps) {
 
         <div>
           <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-3">
-            features (v1.0.0)
+            features (v1.0.1)
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 ml-2">
             <div>
