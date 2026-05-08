@@ -14,6 +14,7 @@ pub fn run() {
         .expect("error while running tauri application");
 }
 
+use csv::StringRecord;
 use serde::{Deserialize, Serialize};
 
 // graph data structure for project serialization
@@ -42,6 +43,7 @@ pub struct CsvFileConfig {
     pub is_visible: bool,
 }
 
+use std::intrinsics::sqrtf64;
 use std::path::Path;
 use std::fs;
 use chrono::Local;
@@ -199,7 +201,7 @@ fn check_path_exists(path: String)-> bool {
 
 // for rust serial - telemetry system
 use std::time::Duration;
-use std::thread;
+use std::thread::{self, current};
 use std::io::Read;
 use tauri::{Emitter, State};
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -268,4 +270,65 @@ fn start_telemetry_stream(
 fn stop_telemetry_stream(state: State<'_, TelemetryState>) -> Result<String, String> {
     state.is_running.store(false, Ordering::Relaxed);
     Ok("Disconnect signal sent.".to_string())
+}
+
+#[derive(Serialize)]
+#[derive(Default)]
+pub struct ColSummary{
+    pub name: String,
+    pub sum: f64,
+    pub min: f64,
+    pub max: f64,
+    pub mean: f64,
+    pub sum_of_squares: f64,
+    pub std_dev: f64,
+    pub missing_count: usize,
+}
+
+#[tauri::command]
+fn analyze_csv(path: String) -> Result<Vec<ColSummary>, String> {
+    let mut rdr = csv::ReaderBuilder::new().flexible(true).from_path(path).map_err(|e| e.to_string())?;
+    let headers = rdr.headers().map_err(|e| e.to_string())?.clone();
+    let mut col_summaries: Vec<ColSummary> = headers.iter().map(|x| ColSummary {
+        name: x.to_string(),
+        min: f64::INFINITY,
+        max: f64::NEG_INFINITY,
+        ..Default::default()
+    }).collect();
+    let mut no_of_rows: usize = 0;
+    for record in rdr.records() {
+        no_of_rows+=1;
+        let result_val = record.map_err(|e| e.to_string());
+        let mut result: StringRecord = StringRecord::default();
+        match result_val {
+            Ok(val) => result = val,
+            Err(e) => {eprintln!("Error getting StringRecord!"); continue;}
+        }
+        for (i, record_val) in result.iter().enumerate() {
+            if let Some(current_col ) = col_summaries.get_mut(i) {
+                let mut val: f64 = 0.0;
+                match record_val.trim().parse::<f64>() {
+                    Ok(val_float) => val = val_float,
+                    Err(e) => {eprintln!("Error parsing column vals!"); current_col.missing_count+=1; continue;},
+                }
+                current_col.sum+=val;
+                current_col.sum_of_squares+=val*val;
+                if current_col.min > val {current_col.min = val;}
+                if current_col.max < val {current_col.max = val;}
+
+            }
+        }
+    }
+
+    for col in &mut col_summaries {
+        let div: f64 = (no_of_rows-col.missing_count) as f64;
+        if div==(0.0 as f64) {col.mean = 0.0; continue;}
+        col.mean = col.sum / div;
+        let variance = col.sum_of_squares/div - col.mean.powi(2);
+        col.std_dev = variance.clamp(0.0, f64::INFINITY).sqrt();
+    }
+
+
+    Ok(col_summaries)
+
 }

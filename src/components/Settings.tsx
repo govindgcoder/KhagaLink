@@ -153,10 +153,15 @@ export default function Settings({ onBack }: SettingsProps) {
       </section>
 
       <section className="max-w-xl">
-        <h2 className="mb-5 text-xl font-medium text-[var(--text-primary)]">
+        <h2 className="mb-2 text-xl font-medium text-[var(--text-primary)]">
           Configure your Gemini API key:
         </h2>
-        <div className="p-4 rounded-2xl border border-[var(--border-color)] bg-[var(--secondary-color)]/40">
+        <p className="text-xs mb-5">
+          All data is sent and recieved only on your pc and google servers, with
+          only the data you provide being sent to Gemini. Your API key is stored
+          on your local machine.
+        </p>
+        <div className="p-2 rounded-2xl border border-[var(--border-color)] bg-[var(--secondary-color)]/40">
           <div className="flex gap-3">
             <input
               type="password"
