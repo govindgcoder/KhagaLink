@@ -9,7 +9,7 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_store::Builder::new().build())
-        .invoke_handler(tauri::generate_handler![create_project, get_csv_metadata, get_csv_rows, load_project, save_project, delete_project, check_path_exists, get_graph_data, start_telemetry_stream, stop_telemetry_stream])
+        .invoke_handler(tauri::generate_handler![create_project, get_csv_metadata, get_csv_rows, load_project, save_project, delete_project, check_path_exists, get_graph_data, start_telemetry_stream, stop_telemetry_stream, analyze_csv, extract_ai_samples])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -43,9 +43,8 @@ pub struct CsvFileConfig {
     pub is_visible: bool,
 }
 
-use std::intrinsics::sqrtf64;
 use std::path::Path;
-use std::fs;
+use std::{fs, result};
 use chrono::Local;
 
 // creates a new project with project.json file
@@ -307,9 +306,10 @@ fn analyze_csv(path: String) -> Result<Vec<ColSummary>, String> {
         for (i, record_val) in result.iter().enumerate() {
             if let Some(current_col ) = col_summaries.get_mut(i) {
                 let mut val: f64 = 0.0;
+
                 match record_val.trim().parse::<f64>() {
                     Ok(val_float) => val = val_float,
-                    Err(e) => {eprintln!("Error parsing column vals!"); current_col.missing_count+=1; continue;},
+                    Err(e) => {eprintln!("Error parsing column vals!: {}",e.to_string()); current_col.missing_count+=1; continue;},
                 }
                 current_col.sum+=val;
                 current_col.sum_of_squares+=val*val;
@@ -331,4 +331,71 @@ fn analyze_csv(path: String) -> Result<Vec<ColSummary>, String> {
 
     Ok(col_summaries)
 
+}
+
+#[tauri::command]
+fn extract_ai_samples(path: String, cols: Vec<usize>, sample_size: usize, total_rows: usize) -> Result<Vec<Vec<f64>>, String> {
+    let mut rdr = csv::ReaderBuilder::new()
+        .flexible(true)
+        .from_path(path)
+        .map_err(|e| e.to_string())?;
+
+    let step_size = if sample_size > 0 && total_rows > sample_size {
+        total_rows / sample_size
+    } else {
+        1
+    };
+
+    let mut samples = Vec::with_capacity(sample_size + (cols.len() * 2));
+
+    let mut min_vals = vec![f64::INFINITY; cols.len()];
+    let mut max_vals = vec![f64::NEG_INFINITY; cols.len()];
+    let mut min_rows: Vec<Vec<f64>> = vec![Vec::new(); cols.len()];
+    let mut max_rows: Vec<Vec<f64>> = vec![Vec::new(); cols.len()];
+
+    for (row_idx, result) in rdr.records().enumerate() {
+        let record = match result {
+            Ok(rec) => rec,
+            Err(_) => continue,
+        };
+
+        let mut current_row_data = Vec::with_capacity(cols.len());
+        for &col_idx in &cols {
+            let val = record.get(col_idx)
+                .unwrap_or("0")
+                .trim()
+                .parse::<f64>()
+                .unwrap_or(0.0);
+            current_row_data.push(val);
+        }
+
+        for i in 0..cols.len() {
+            let val = current_row_data[i];
+            if val < min_vals[i] {
+                min_vals[i] = val;
+                min_rows[i] = current_row_data.clone();
+            }
+            if val > max_vals[i] {
+                max_vals[i] = val;
+                max_rows[i] = current_row_data.clone();
+            }
+        }
+
+        if row_idx % step_size == 0 && samples.len() < sample_size {
+            samples.push(current_row_data.clone());
+        }
+    }
+
+    for row in min_rows {
+        if !row.is_empty() {
+            samples.push(row);
+        }
+    }
+    for row in max_rows {
+        if !row.is_empty() {
+            samples.push(row);
+        }
+    }
+
+    Ok(samples)
 }
